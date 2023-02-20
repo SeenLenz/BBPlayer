@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="BBPlayer.SongRow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BBPlayer"
+             mc:Ignorable="d" d:DesignWidth="1200" Height="35">
+    <Grid Background="#FFFFFFFF">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Label Name="lb_SongName" HorizontalAlignment="Center" VerticalAlignment="Center">lb_SongName</Label>
+        <StackPanel  Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Button Name="bt_PlaySong" Width="30" Height="30" Margin="10px 0px 0px 0px">></Button>
+            <Button Name="bt_SongOptions" Width="30" Height="30" Margin="10px 0px 0px 0px">...</Button>
+        </StackPanel>
+        <Label Name="lb_SongLenght" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding SongLenght}"></Label>
+        <Label Name="lb_DateAdded" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">lb_DateAdded</Label>
+    </Grid>
+</UserControl>
