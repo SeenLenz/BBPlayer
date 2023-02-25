@@ -18,17 +18,27 @@ namespace BBPlayer
     public partial class MainWindow : Window
     {
         //This section contains the normal properties of the MainWindow class
+        BinaryFormatter formatter = new BinaryFormatter();
         public List<String> SupFormats = new List<String> { ".mp3", ".wav", ".aiff", ".ogg" };
+        public List<String> Files = new List<String> { };
+        private string[] _folders = new string[] { };
+        Dictionary<int, Playlist> Playlists;
+        Dictionary<int, Album> Albums;
 
-        private int _id = 0;
+        private Config _config;
+        public Config Config
+        {
+            get { return _config; }
+            set { _config = value; }
+        }
+
+        private int _id;
 
         public int ID
         {
-            get { return _id; }
+            get { return ++_id; }
             set { _id = value; }
         }
-
-        private string[] _folders = new string[] { };
 
         public string[] Folders
         {
@@ -42,31 +52,127 @@ namespace BBPlayer
                 this.MessageQueue.Enqueue(value);
             }
         }
-        public List<String> Files = new List<String> { };
-        private List<Song> Songs = new List<Song>();
 
         //This section contains the properties for MainWindow required for BackgroundTask
         ConcurrentQueue<string[]> MessageQueue = new ConcurrentQueue<string[]>();
-        ConcurrentDictionary<int, Song> MediaLibrary = new ConcurrentDictionary<int, Song>();
+        ConcurrentDictionary<string, Song> MediaLibrary;
         ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
         bool FileThreadRunning = true;
 
         public MainWindow()
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (Stream stream = System.IO.File.Open("./Data/Folders.bin", FileMode.Open))
+
+            try
             {
-                try
+                using (Stream stream = System.IO.File.Open("./Config.bin", FileMode.Open))
                 {
-                    this.Folders = (string[])formatter.Deserialize(stream);
-                }
-                catch (System.Runtime.Serialization.SerializationException)
-                {
+                    try
+                    {
+                        this.Config = (Config)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
 
-                    this.Folders = new string[] { };
-                }
+                        this.Config = new Config();
+                    }
 
+                }
             }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Config.bin")) { }
+                this.Config = new Config();
+            }
+
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Folders = (string[])formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.Folders = new string[] { };
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+
+                using (FileStream fileStream = System.IO.File.Create("./Folders.bin")) { }
+                this.Folders = new string[] { };
+            }
+
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./MediaLibrary.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.MediaLibrary = (ConcurrentDictionary<string, Song>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.MediaLibrary = new ConcurrentDictionary<string, Song>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./MediaLibrary.bin")) { }
+                this.MediaLibrary = new ConcurrentDictionary<string, Song>();
+            }
+
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Albums.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Albums = (Dictionary<int, Album>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.Albums = new Dictionary<int, Album>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Albums.bin")) { }
+                this.Albums = new Dictionary<int, Album>();
+            }
+
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Playlists.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Playlists = (Dictionary<int, Playlist>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.Playlists = new Dictionary<int, Playlist>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
+                this.Playlists = new Dictionary<int, Playlist>();
+            }
+
             Thread FileThread = new Thread(BackgroundTask);
             FileThread.Start();
             InitializeComponent();
@@ -79,7 +185,6 @@ namespace BBPlayer
             Closing -= WindowEventClose;
             this.FileThreadRunning = false;
         }
-
 
         private void BackgroundTask()
         {
@@ -109,11 +214,6 @@ namespace BBPlayer
 
                 }
 
-                BinaryFormatter formatter = new BinaryFormatter();
-                using (Stream stream = System.IO.File.Open("./Data/Folders.bin", FileMode.Create))
-                {
-                    formatter.Serialize(stream, this.Folders);
-                }
 
                 Thread.Sleep(200);
             }
@@ -123,31 +223,28 @@ namespace BBPlayer
         {
             FileSystemWatcher watcher = new FileSystemWatcher(path);
 
+            watcher.EnableRaisingEvents = true;
+
             watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 
             watcher.Created += DirectoryEventCreated;
             watcher.Deleted += DirectoryEventDeleted;
+            watcher.Changed += DirectoryEventChanged;
 
             this.Watchers.TryAdd(path, watcher);
         }
 
         private void DirectoryEventCreated(object source, FileSystemEventArgs e)
         {
-            MediaLibrary.TryAdd(this.ID, new Song(e.FullPath));
+            MediaLibrary.TryAdd(e.Name, new Song(e.FullPath));
         }
 
         private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
         {
-            foreach (var entry in MediaLibrary)
-            {
-                if (entry.Value.Path == e.FullPath)
-                {
-                    MediaLibrary.TryRemove(entry.Key, out _);
-                }
-            }
+            MediaLibrary.TryRemove(e.Name, out _);
         }
 
-        private void DirectoryEventModify(string path)
+        private void DirectoryEventChanged(object source, FileSystemEventArgs e)
         {
 
         }
@@ -156,7 +253,7 @@ namespace BBPlayer
         {
             foreach (var file in this.Files)
             {
-                MediaLibrary.TryAdd(this.ID, new Song(file));
+                MediaLibrary.TryAdd(file.Split(@"\").Last(), new Song(file));
             }
         }
 
@@ -172,6 +269,7 @@ namespace BBPlayer
             var dlg = new CommonOpenFileDialog();
             dlg.IsFolderPicker = true;
             dlg.Multiselect = true;
+            dlg.ShowPlacesList = true;
 
             if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
             {
@@ -187,14 +285,21 @@ namespace BBPlayer
                 }
 
                 this.Folders = Folders.Concat(selectedFolders).ToArray();
+
+                using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Create))
+                {
+                    formatter.Serialize(stream, this.Folders);
+                }
             }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            Directories.Text = "";
+
             foreach (var entry in this.MediaLibrary)
             {
-                Directories.Text += $"Name: {entry.Value.Title}\nTrack: {entry.Value.Track}\nYear: {entry.Value.Year}\nGenre: {entry.Value.Genre}\nAlbum: {entry.Value.Album}\nArtist: {entry.Value.Artist}\nDisc: {entry.Value.Disc}\nDuration: {entry.Value.Duration}\nPath: {entry.Value.Path}\n";
+                Directories.Text += $"\n\nKey: {entry.Key}\nName: {entry.Value.Title}\nTrack: {entry.Value.Track}\nYear: {entry.Value.Year}\nGenre: {entry.Value.Genre}\nAlbum: {entry.Value.Album}\nArtist: {entry.Value.Artist}\nDisc: {entry.Value.Disc}\nDuration: {entry.Value.Duration}\nPath: {entry.Value.Path}\n";
             }
         }
     }

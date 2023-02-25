@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BBPlayer.Classes
 {
-    internal class Song
+    public class Song
     {
         public TimeSpan Duration { get; set; }
         public TagLib.File Raw { get; set; }
@@ -18,6 +18,7 @@ namespace BBPlayer.Classes
         public string Genre { get; set; }
         public string Track { get; set; }
         public string Disc { get; set; }
+        public int ID { get; set; }
 
         public Song(string Path)
         {
@@ -33,6 +34,7 @@ namespace BBPlayer.Classes
                 this.Genre = this.Raw.Tag.FirstGenre ?? "Unknown Genre";
                 this.Track = Convert.ToString(this.Raw.Tag.Track);
                 this.Disc = Convert.ToString(this.Raw.Tag.Disc);
+                this.ID = ID;
             }
         }
     }
