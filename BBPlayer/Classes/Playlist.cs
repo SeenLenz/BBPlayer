@@ -12,7 +12,7 @@ namespace BBPlayer.Classes
         public string ImagePath { get; set; }
         public string Description { get; set; }
         public int ID { get; set; }
-        Dictionary<string, Song> SongList { get; set; }
+        public List<string> SongIdList { get; set; }
 
         public Playlist(int ID)
         {
@@ -20,7 +20,7 @@ namespace BBPlayer.Classes
             this.Title = $"My Playlist #{ID}";
             this.ImagePath = @"/Path/To/Image";
             this.Description = @"This is a playlist";
-            this.SongList = new Dictionary<string, Song>();
+            this.SongIdList = new List<string>();
         }
     }
 }

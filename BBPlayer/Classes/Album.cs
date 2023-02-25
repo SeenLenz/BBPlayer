@@ -14,7 +14,7 @@ namespace BBPlayer.Classes
         public string Genre { get; set; }
         public int Length { get; set; }
         public int ID { get; set; }
-        Dictionary<string, Song> SongList { get; set; }
+        public List<string> SongIdList { get; set; }
 
         public Album(int ID)
         {
@@ -24,7 +24,7 @@ namespace BBPlayer.Classes
             this.ImagePath = @"/Path/To/Image";
             this.Genre = @"Unknown Genre";
             this.Artist = @"Unknown Artist";
-            this.SongList = new Dictionary<string, Song>();
+            this.SongIdList = new List<string>();
         }
         public void AddSong() { }
         public void RemoveSong() { }

@@ -14,16 +14,19 @@ using TagLib;
 namespace BBPlayer
 {
 
-
     public partial class MainWindow : Window
     {
-        //This section contains the normal properties of the MainWindow class
+        #region Properties
         BinaryFormatter formatter = new BinaryFormatter();
-        public List<String> SupFormats = new List<String> { ".mp3", ".wav", ".aiff", ".ogg" };
+        public List<String> SupportedFormats = new List<String> { ".mp3", ".wav", ".aiff", ".ogg" };
+
+        //This is a temporary property used to store the file paths froma parse Directory
         public List<String> Files = new List<String> { };
-        private string[] _folders = new string[] { };
-        Dictionary<int, Playlist> Playlists;
-        Dictionary<int, Album> Albums;
+
+
+        Dictionary<string, Playlist> Playlists;
+        Dictionary<string, Album> Albums;
+
 
         private Config _config;
         public Config Config
@@ -32,14 +35,16 @@ namespace BBPlayer
             set { _config = value; }
         }
 
-        private int _id;
 
+        private int _id;
         public int ID
         {
             get { return ++_id; }
             set { _id = value; }
         }
 
+
+        private string[] _folders = new string[] { };
         public string[] Folders
         {
             get
@@ -53,14 +58,20 @@ namespace BBPlayer
             }
         }
 
-        //This section contains the properties for MainWindow required for BackgroundTask
+        //DO NOT TOUCH!!! This section contains the properties for MainWindow required for BackgroundTask
         ConcurrentQueue<string[]> MessageQueue = new ConcurrentQueue<string[]>();
         ConcurrentDictionary<string, Song> MediaLibrary;
         ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
         bool FileThreadRunning = true;
+        #endregion
 
+        #region Threads
         public MainWindow()
         {
+            //Here Every bin File gets deserialized (file beolvasas) 
+            //In the first try block we look if the file exists 
+            //in the second try block we handle the file empty exceptio
+            //we do this for every .bin file (Config, MusicLibrary, Playlists, Albums, Folders)
 
             try
             {
@@ -135,12 +146,12 @@ namespace BBPlayer
                 {
                     try
                     {
-                        this.Albums = (Dictionary<int, Album>)formatter.Deserialize(stream);
+                        this.Albums = (Dictionary<string, Album>)formatter.Deserialize(stream);
                     }
                     catch (System.Runtime.Serialization.SerializationException)
                     {
 
-                        this.Albums = new Dictionary<int, Album>();
+                        this.Albums = new Dictionary<string, Album>();
                     }
 
                 }
@@ -148,7 +159,7 @@ namespace BBPlayer
             catch (System.IO.FileNotFoundException)
             {
                 using (FileStream fileStream = System.IO.File.Create("./Albums.bin")) { }
-                this.Albums = new Dictionary<int, Album>();
+                this.Albums = new Dictionary<string, Album>();
             }
 
             try
@@ -157,12 +168,12 @@ namespace BBPlayer
                 {
                     try
                     {
-                        this.Playlists = (Dictionary<int, Playlist>)formatter.Deserialize(stream);
+                        this.Playlists = (Dictionary<string, Playlist>)formatter.Deserialize(stream);
                     }
                     catch (System.Runtime.Serialization.SerializationException)
                     {
 
-                        this.Playlists = new Dictionary<int, Playlist>();
+                        this.Playlists = new Dictionary<string, Playlist>();
                     }
 
                 }
@@ -170,7 +181,7 @@ namespace BBPlayer
             catch (System.IO.FileNotFoundException)
             {
                 using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
-                this.Playlists = new Dictionary<int, Playlist>();
+                this.Playlists = new Dictionary<string, Playlist>();
             }
 
             Thread FileThread = new Thread(BackgroundTask);
@@ -179,17 +190,15 @@ namespace BBPlayer
             Closing += WindowEventClose;
         }
 
-        private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
+        private void MediaTask()
         {
 
-            Closing -= WindowEventClose;
-            this.FileThreadRunning = false;
         }
 
         private void BackgroundTask()
         {
 
-
+            //This section gets called only once and parses all the folders for any changes
             foreach (var folder in this.Folders)
             {
                 this.ParseFolder(folder);
@@ -201,6 +210,7 @@ namespace BBPlayer
             while (this.FileThreadRunning)
             {
 
+                //this section gets called every 5 seconds and checks for new folders, if there are any it parses them
                 string[] value;
                 if (MessageQueue.TryDequeue(out value))
                 {
@@ -214,11 +224,13 @@ namespace BBPlayer
 
                 }
 
-
-                Thread.Sleep(200);
+                Thread.Sleep(5000);
             }
         }
 
+        #endregion
+
+        #region Filesystem Interactions
         private void DirectoryEventSub(string path)
         {
             FileSystemWatcher watcher = new FileSystemWatcher(path);
@@ -233,38 +245,50 @@ namespace BBPlayer
 
             this.Watchers.TryAdd(path, watcher);
         }
-
         private void DirectoryEventCreated(object source, FileSystemEventArgs e)
         {
             MediaLibrary.TryAdd(e.Name, new Song(e.FullPath));
         }
-
         private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
         {
             MediaLibrary.TryRemove(e.Name, out _);
         }
-
         private void DirectoryEventChanged(object source, FileSystemEventArgs e)
         {
-
+            //This is unhandled as of yet, since im not shure how this event works and stuff
         }
-
         private void ParseFiles()
         {
             foreach (var file in this.Files)
             {
-                MediaLibrary.TryAdd(file.Split(@"\").Last(), new Song(file));
+                string name = file.Split(@"\").Last();
+                this.MediaLibrary.TryAdd(name, new Song(file));
+                if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
+                {
+                    AddSongToAlbum(name);
+                }
+                else
+                {
+                    AddAlbum(this.MediaLibrary[name].Album);
+                }
             }
         }
-
         private void ParseFolder(string path)
         {
             this.Files.AddRange(Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
-                    .Where(item => SupFormats.Contains(Path.GetExtension(item).ToLower()))
+                    .Where(item => SupportedFormats.Contains(Path.GetExtension(item).ToLower()))
                     .Select(item => Path.GetFullPath(item))
                     .ToList());
         }
-        private void Add_Folder(object sender, RoutedEventArgs e)
+        #endregion
+
+        #region Gui Event Handlers
+        private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Closing -= WindowEventClose;
+            this.FileThreadRunning = false;
+        }
+        private void bt_AddFolder(object sender, RoutedEventArgs e)
         {
             var dlg = new CommonOpenFileDialog();
             dlg.IsFolderPicker = true;
@@ -292,8 +316,7 @@ namespace BBPlayer
                 }
             }
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void bt_ListDirectories(object sender, RoutedEventArgs e)
         {
             Directories.Text = "";
 
@@ -302,5 +325,71 @@ namespace BBPlayer
                 Directories.Text += $"\n\nKey: {entry.Key}\nName: {entry.Value.Title}\nTrack: {entry.Value.Track}\nYear: {entry.Value.Year}\nGenre: {entry.Value.Genre}\nAlbum: {entry.Value.Album}\nArtist: {entry.Value.Artist}\nDisc: {entry.Value.Disc}\nDuration: {entry.Value.Duration}\nPath: {entry.Value.Path}\n";
             }
         }
+
+        private void bt_Play(object sender, RoutedEventArgs e) { PlaySong(); }
+        private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
+        private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
+        #endregion
+
+        #region Album Actions
+        private void RemoveAlbum(string key)
+        {
+            this.Albums.Remove(key);
+        }
+        private void AddAlbum(string key)
+        {
+            this.Albums.Add(key, new Album(ID));
+        }
+        private void AddSongToAlbum(string key)
+        {
+            this.Albums[this.MediaLibrary[key].Album].SongIdList.Add(key);
+        }
+        private void RemoveSongFromAlbum(string AlbumKey, string SongKey)
+        {
+            this.Albums[AlbumKey].SongIdList.Remove(SongKey);
+        }
+        #endregion
+
+        #region Playlist Actions
+        private void RemovePlaylist(string key)
+        {
+            this.Playlists.Remove(key);
+        }
+        private void AddPlaylist(string key)
+        {
+            this.Albums.Add(key, new Album(ID));
+        }
+        private void AddSongToPlaylist(string key)
+        {
+            this.Albums[this.MediaLibrary[key].Album].SongIdList.Add(key);
+        }
+        private void RemoveSongFromPlaylist(string PlaylistKey, string SongKey)
+        {
+            this.Albums[PlaylistKey].SongIdList.Remove(SongKey);
+        }
+        #endregion
+
+        #region Playback Functions
+        private void Replay() { }
+        private void Shuffle() { }
+        private void PreviousSong() { }
+        private void NextSong() { }
+        private void PlaySong()
+        {
+            using (var audioFile = new AudioFileReader(this.MediaLibrary["Nightcore - Bad boy (128 kbps).mp3"].Path))
+            using (var outputDevice = new WaveOutEvent())
+            {
+                outputDevice.Init(audioFile);
+                outputDevice.Play();
+                while (outputDevice.PlaybackState == PlaybackState.Playing)
+                {
+                    Thread.Sleep(1000);
+                }
+            }
+        }
+        private void PauseSong() { }
+        private void StopSong() { }
+        #endregion
+
     }
 }
