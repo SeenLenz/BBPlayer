@@ -8,25 +8,36 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using TagLib;
 
 namespace BBPlayer
 {
-
     public partial class MainWindow : Window
     {
         #region Properties
-        BinaryFormatter formatter = new BinaryFormatter();
+
+        private WaveOutEvent outputDevice = new WaveOutEvent();
+        private AudioFileReader audioFile;
+
+        private KeyValuePair<string, Song> SongInFocus;
+        private List<KeyValuePair<string, Song>> SongList = new List<KeyValuePair<string, Song>> { };
+        private int SongIndex = 0;
+
+        public BinaryFormatter formatter = new BinaryFormatter();
         public List<String> SupportedFormats = new List<String> { ".mp3", ".wav", ".aiff", ".ogg" };
 
         //This is a temporary property used to store the file paths froma parse Directory
         public List<String> Files = new List<String> { };
 
 
-        Dictionary<string, Playlist> Playlists;
-        Dictionary<string, Album> Albums;
+        public Dictionary<string, Playlist> Playlists;
+        public Dictionary<string, Album> Albums;
 
+        public bool isShuffle = false;
+        public bool isReplay = false;
+        public bool isReplayInfinite = false;
 
         private Config _config;
         public Config Config
@@ -59,10 +70,14 @@ namespace BBPlayer
         }
 
         //DO NOT TOUCH!!! This section contains the properties for MainWindow required for BackgroundTask
-        ConcurrentQueue<string[]> MessageQueue = new ConcurrentQueue<string[]>();
-        ConcurrentDictionary<string, Song> MediaLibrary;
-        ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
-        bool FileThreadRunning = true;
+        public BlockingCollection<Song> Playback_MessageQueue = new BlockingCollection<Song>();
+        private CancellationTokenSource CancellationToken = new CancellationTokenSource();
+        public ConcurrentQueue<string[]> MessageQueue = new ConcurrentQueue<string[]>();
+        public ConcurrentDictionary<string, Song> MediaLibrary;
+        public ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
+        public bool FileThreadRunning = true;
+        private Task PlaybackTask;
+        private Task FileTask;
         #endregion
 
         #region Threads
@@ -183,16 +198,28 @@ namespace BBPlayer
                 using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
                 this.Playlists = new Dictionary<string, Playlist>();
             }
-
-            Thread FileThread = new Thread(BackgroundTask);
-            FileThread.Start();
+            this.outputDevice.PlaybackStopped += OnPlaybackStopped;
+            this.PlaybackTask = Task.Run(() => MediaTask());
+            this.FileTask = Task.Run(() => BackgroundTask());
             InitializeComponent();
             Closing += WindowEventClose;
         }
 
         private void MediaTask()
         {
+            while (!this.CancellationToken.Token.IsCancellationRequested)
+            {
+                try
+                {
+                    Song song = this.Playback_MessageQueue.Take(this.CancellationToken.Token);
+                    this.outputDevice.Init(this.audioFile = new AudioFileReader(song.Path));
+                    outputDevice.Play();
+                }
+                catch (OperationCanceledException)
+                {
 
+                }
+            }
         }
 
         private void BackgroundTask()
@@ -207,7 +234,10 @@ namespace BBPlayer
             this.ParseFiles();
             this.Files = new List<String> { };
 
-            while (this.FileThreadRunning)
+            this.SongList = this.MediaLibrary.OrderBy(e => e.Value.ID).ToList();
+            this.SongInFocus = this.SongList[SongIndex];
+
+            while (!this.CancellationToken.Token.IsCancellationRequested)
             {
 
                 //this section gets called every 5 seconds and checks for new folders, if there are any it parses them
@@ -231,38 +261,14 @@ namespace BBPlayer
         #endregion
 
         #region Filesystem Interactions
-        private void DirectoryEventSub(string path)
-        {
-            FileSystemWatcher watcher = new FileSystemWatcher(path);
 
-            watcher.EnableRaisingEvents = true;
-
-            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-
-            watcher.Created += DirectoryEventCreated;
-            watcher.Deleted += DirectoryEventDeleted;
-            watcher.Changed += DirectoryEventChanged;
-
-            this.Watchers.TryAdd(path, watcher);
-        }
-        private void DirectoryEventCreated(object source, FileSystemEventArgs e)
-        {
-            MediaLibrary.TryAdd(e.Name, new Song(e.FullPath));
-        }
-        private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
-        {
-            MediaLibrary.TryRemove(e.Name, out _);
-        }
-        private void DirectoryEventChanged(object source, FileSystemEventArgs e)
-        {
-            //This is unhandled as of yet, since im not shure how this event works and stuff
-        }
         private void ParseFiles()
         {
             foreach (var file in this.Files)
             {
                 string name = file.Split(@"\").Last();
-                this.MediaLibrary.TryAdd(name, new Song(file));
+                this.MediaLibrary.TryAdd(name, new Song(file, ID));
+                this.SongList.Add(new KeyValuePair<string, Song>(name, new Song(file, ID)));
                 if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
                 {
                     AddSongToAlbum(name);
@@ -280,13 +286,19 @@ namespace BBPlayer
                     .Select(item => Path.GetFullPath(item))
                     .ToList());
         }
+        private void LoadSong(string path) { }
         #endregion
 
         #region Gui Event Handlers
         private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Closing -= WindowEventClose;
-            this.FileThreadRunning = false;
+            outputDevice.Stop();
+            outputDevice.Dispose();
+            Playback_MessageQueue.CompleteAdding();
+            CancellationToken.Cancel();
+            PlaybackTask.Wait();
+            FileTask.Wait();
         }
         private void bt_AddFolder(object sender, RoutedEventArgs e)
         {
@@ -324,11 +336,48 @@ namespace BBPlayer
             {
                 Directories.Text += $"\n\nKey: {entry.Key}\nName: {entry.Value.Title}\nTrack: {entry.Value.Track}\nYear: {entry.Value.Year}\nGenre: {entry.Value.Genre}\nAlbum: {entry.Value.Album}\nArtist: {entry.Value.Artist}\nDisc: {entry.Value.Disc}\nDuration: {entry.Value.Duration}\nPath: {entry.Value.Path}\n";
             }
-        }
 
+            //Directories.Text += $"\n\nKey: {this.SongInFocus.Key}\nName: {this.SongInFocus.Value.Title}\nTrack: {this.SongInFocus.Value.Track}\nYear: {this.SongInFocus.Value.Year}\nGenre: {this.SongInFocus.Value.Genre}\nAlbum: {this.SongInFocus.Value.Album}\nArtist: {this.SongInFocus.Value.Artist}\nDisc: {this.SongInFocus.Value.Disc}\nDuration: {this.SongInFocus.Value.Duration}\nPath: {this.SongInFocus.Value.Path}\n";
+
+        }
         private void bt_Play(object sender, RoutedEventArgs e) { PlaySong(); }
         private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
+        private void bt_Stop(object sender, RoutedEventArgs e) { StopSong(); }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
+        #endregion
+
+        #region Event Handlers
+        private void DirectoryEventSub(string path)
+        {
+            FileSystemWatcher watcher = new FileSystemWatcher(path);
+
+            watcher.EnableRaisingEvents = true;
+
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+
+            watcher.Created += DirectoryEventCreated;
+            watcher.Deleted += DirectoryEventDeleted;
+            watcher.Changed += DirectoryEventChanged;
+
+            this.Watchers.TryAdd(path, watcher);
+        }
+        private void DirectoryEventCreated(object source, FileSystemEventArgs e)
+        {
+            MediaLibrary.TryAdd(e.Name, new Song(e.FullPath, ID));
+        }
+        private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
+        {
+            MediaLibrary.TryRemove(e.Name, out _);
+        }
+        private void DirectoryEventChanged(object source, FileSystemEventArgs e)
+        {
+            //This is unhandled as of yet, since im not shure how this event works and stuff
+        }
+        public void OnPlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            audioFile.Dispose();
+            audioFile = null;
+        }
         #endregion
 
         #region Album Actions
@@ -369,26 +418,17 @@ namespace BBPlayer
         }
         #endregion
 
-        #region Playback Functions
+        #region Playback Actions
         private void Replay() { }
         private void Shuffle() { }
-        private void PreviousSong() { }
-        private void NextSong() { }
+        private void PreviousSong() { this.SongInFocus = this.SongList[--SongIndex]; }
+        private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
         private void PlaySong()
         {
-            using (var audioFile = new AudioFileReader(this.MediaLibrary["Nightcore - Bad boy (128 kbps).mp3"].Path))
-            using (var outputDevice = new WaveOutEvent())
-            {
-                outputDevice.Init(audioFile);
-                outputDevice.Play();
-                while (outputDevice.PlaybackState == PlaybackState.Playing)
-                {
-                    Thread.Sleep(1000);
-                }
-            }
+            Playback_MessageQueue.Add(this.SongInFocus.Value);
         }
         private void PauseSong() { }
-        private void StopSong() { }
+        private void StopSong() { this.outputDevice.Stop(); }
         #endregion
 
     }
