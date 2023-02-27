@@ -120,10 +120,8 @@ namespace BBPlayer
                     }
                     catch (System.Runtime.Serialization.SerializationException)
                     {
-
                         this.Folders = new string[] { };
                     }
-
                 }
             }
             catch (System.IO.FileNotFoundException)
@@ -198,6 +196,7 @@ namespace BBPlayer
                 using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
                 this.Playlists = new Dictionary<string, Playlist>();
             }
+
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
             this.FileTask = Task.Run(() => BackgroundTask());
@@ -212,7 +211,7 @@ namespace BBPlayer
                 try
                 {
                     Song song = this.Playback_MessageQueue.Take(this.CancellationToken.Token);
-                    this.outputDevice.Init(this.audioFile = new AudioFileReader(song.Path));
+                    this.outputDevice.Init(new AudioFileReader(song.Path));
                     outputDevice.Play();
                 }
                 catch (OperationCanceledException)
@@ -235,7 +234,11 @@ namespace BBPlayer
             this.Files = new List<String> { };
 
             this.SongList = this.MediaLibrary.OrderBy(e => e.Value.ID).ToList();
-            this.SongInFocus = this.SongList[SongIndex];
+
+            if (this.SongList.Count != 0)
+            {
+                this.SongInFocus = this.SongList[SongIndex];
+            }
 
             while (!this.CancellationToken.Token.IsCancellationRequested)
             {
@@ -250,6 +253,11 @@ namespace BBPlayer
                         this.DirectoryEventSub(folder);
                     }
                     this.ParseFiles();
+                    if (this.SongIndex == null)
+                    {
+                        this.SongInFocus = this.SongList[SongIndex];
+                    }
+
                     this.Files = new List<String> { };
 
                 }
@@ -375,8 +383,6 @@ namespace BBPlayer
         }
         public void OnPlaybackStopped(object sender, StoppedEventArgs e)
         {
-            audioFile.Dispose();
-            audioFile = null;
         }
         #endregion
 

@@ -29,7 +29,7 @@ namespace BBPlayer.Classes
                 this.Path = Path;
                 this.Duration = this.Raw.Properties.Duration;
                 this.Title = this.Raw.Tag.Title ?? Path.Split(@"\").Last().Split(".").First();
-                this.FileName = this.Raw.Tag.Title ?? Path.Split(@"\").Last();
+                this.FileName = Path.Split(@"\").Last();
                 this.Artist = this.Raw.Tag.FirstPerformer ?? "Unknown Artis";
                 this.Album = this.Raw.Tag.Album ?? "Unknown Album";
                 this.Year = Convert.ToString(this.Raw.Tag.Year);
