@@ -426,7 +426,23 @@ namespace BBPlayer
         #endregion
 
         #region Playback Actions
-        private void Replay() { }
+        private void Replay() {
+            if(isReplay == false)
+            {
+                isReplay = true;
+                
+            }
+            else if( isReplay == true)
+            {
+                isReplay = false;
+                isReplayInfinite = true;
+            }
+            else
+            {
+                isReplayInfinite = false;
+                
+            }
+        }
         private void Shuffle() { }
         private void PreviousSong() { this.SongInFocus = this.SongList[--SongIndex]; }
         private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
