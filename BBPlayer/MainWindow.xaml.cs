@@ -55,6 +55,7 @@ namespace BBPlayer
         }
 
 
+
         private string[] _folders = new string[] { };
         public string[] Folders
         {
