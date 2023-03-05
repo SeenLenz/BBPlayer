@@ -225,21 +225,21 @@ namespace BBPlayer
         {
 
             //This section gets called only once and parses all the folders for any changes
-            foreach (var folder in this.Folders)
-            {
-                this.ParseFolder(folder);
-                this.DirectoryEventSub(folder);
-            }
-            this.ParseFiles();
-            this.Files = new List<String> { };
 
-            this.SongList = this.MediaLibrary.OrderBy(e => e.Value.ID).ToList();
-
-            if (this.SongList.Count != 0)
+            if (this.Folders.Length != 0)
             {
+                foreach (var folder in this.Folders)
+                {
+                    this.ParseFolder(folder);
+                    this.DirectoryEventSub(folder);
+                }
+                this.ParseFiles();
+                this.Files = new List<String> { };
+
+                this.SongList = this.MediaLibrary.OrderBy(e => e.Value.ID).ToList();
+
                 this.SongInFocus = this.SongList[SongIndex];
             }
-
             while (!this.CancellationToken.Token.IsCancellationRequested)
             {
 
@@ -277,6 +277,17 @@ namespace BBPlayer
                 string name = file.Split(@"\").Last();
                 this.MediaLibrary.TryAdd(name, new Song(file, ID));
                 this.SongList.Add(new KeyValuePair<string, Song>(name, new Song(file, ID)));
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SongRow row = new SongRow();
+                    row.SongTitle = $"{MediaLibrary[name].Title}";
+                    row.SongArtist = $"{MediaLibrary[name].Artist}";
+                    row.SongYear = $"{MediaLibrary[name].Year}";
+                    row.SongGenre = $"{MediaLibrary[name].Genre}";
+                    row.SongDuration = $"{MediaLibrary[name].Duration}";
+                    SongPanel.Children.Add(row);
+                });
+
                 if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
                 {
                     AddSongToAlbum(name);

@@ -27,20 +27,7 @@
         <Button Content="Add File" Width="60px" Height="20px" Click="bt_AddFolder" ></Button>
         <StackPanel Grid.Column="0" Grid.ColumnSpan="2"/>
         <ScrollViewer Grid.Column="1">
-            <StackPanel >
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
+            <StackPanel x:Name="SongPanel">
             </StackPanel>
         </ScrollViewer>
 
