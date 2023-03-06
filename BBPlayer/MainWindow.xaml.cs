@@ -336,13 +336,13 @@ namespace BBPlayer
                 }
             }
         }
-        private void bt_ListDirectories(object sender, RoutedEventArgs e)
+        private void bt_listdirectories(object sender, routedeventargs e)
         {
-            Directories.Text = "";
+            directories.text = "";
 
-            foreach (var entry in this.MediaLibrary)
+            foreach (var entry in this.medialibrary)
             {
-                Directories.Text += $"\n\nKey: {entry.Key}\nName: {entry.Value.Title}\nTrack: {entry.Value.Track}\nYear: {entry.Value.Year}\nGenre: {entry.Value.Genre}\nAlbum: {entry.Value.Album}\nArtist: {entry.Value.Artist}\nDisc: {entry.Value.Disc}\nDuration: {entry.Value.Duration}\nPath: {entry.Value.Path}\n";
+                directories.text += $"\n\nkey: {entry.key}\nname: {entry.value.title}\ntrack: {entry.value.track}\nyear: {entry.value.year}\ngenre: {entry.value.genre}\nalbum: {entry.value.album}\nartist: {entry.value.artist}\ndisc: {entry.value.disc}\nduration: {entry.value.duration}\npath: {entry.value.path}\n";
             }
 
             //Directories.Text += $"\n\nKey: {this.SongInFocus.Key}\nName: {this.SongInFocus.Value.Title}\nTrack: {this.SongInFocus.Value.Track}\nYear: {this.SongInFocus.Value.Year}\nGenre: {this.SongInFocus.Value.Genre}\nAlbum: {this.SongInFocus.Value.Album}\nArtist: {this.SongInFocus.Value.Artist}\nDisc: {this.SongInFocus.Value.Disc}\nDuration: {this.SongInFocus.Value.Duration}\nPath: {this.SongInFocus.Value.Path}\n";

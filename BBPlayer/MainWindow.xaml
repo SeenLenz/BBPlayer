@@ -5,44 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:userControls="clr-namespace:BBPlayer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStyle="ThreeDBorderWindow">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"></ColumnDefinition>
-            <ColumnDefinition Width="8*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition  Height="20*"></RowDefinition>
-            <RowDefinition Height="3*">
-            </RowDefinition>
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" >
-            <Button Content="Previous" Width="60px" Height="20px" Margin="5" Click="bt_Previous"></Button>
-            <Button Content="Play" Width="60px" Height="20px" Margin="5" Click="bt_Play"></Button>
-            <Button Content="Stop" Width="60px" Height="20px" Margin="5" Click="bt_Stop"></Button>
-            <Button Content="Next" Width="60px" Height="20px" Margin="5" Click="bt_Next"></Button>
-            <Button Content="ListDirs" Width="60px" Height="20px" Margin="5" Click="bt_ListDirectories"></Button>
-        </StackPanel>
-        <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Center" Height="800"/>
-        <Button Content="Add File" Width="60px" Height="20px" Click="bt_AddFolder" ></Button>
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2"/>
-        <ScrollViewer Grid.Column="1">
-            <StackPanel >
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
-                <userControls:SongRow />
+        Height="450" Width="800" WindowStyle="None">
+    <Border CornerRadius="20,20,20,20" Background="#FF151515">
+        <Grid >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="8*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <Rectangle Grid.ColumnSpan="2" Grid.RowSpan="2">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="Purple" Offset="0.0"/>
+                        <GradientStop Color="Black" Offset="0.9"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <StackPanel Background="Black" Opacity="0.8" Grid.RowSpan="2">
+                <Button/>
             </StackPanel>
-        </ScrollViewer>
+            <StackPanel Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
+            </StackPanel>
 
-    </Grid>
+        </Grid>
+    </Border>
 </Window>
