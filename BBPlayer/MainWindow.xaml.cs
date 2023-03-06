@@ -38,6 +38,7 @@ namespace BBPlayer
         public bool isShuffle = false;
         public bool isReplay = false;
         public bool isReplayInfinite = false;
+        public int PlaybackState = 0;
 
         private Config _config;
         public Config Config
@@ -79,6 +80,7 @@ namespace BBPlayer
         public bool FileThreadRunning = true;
         private Task PlaybackTask;
         private Task FileTask;
+        private Task PlaybackStateTask;
         #endregion
 
         #region Threads
@@ -201,6 +203,8 @@ namespace BBPlayer
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
             this.FileTask = Task.Run(() => BackgroundTask());
+            this.PlaybackStateTask = Task.Run(() => PlayingStateSeconds());
+
             InitializeComponent();
             Closing += WindowEventClose;
         }
@@ -267,6 +271,19 @@ namespace BBPlayer
             }
         }
 
+       private void PlayingStateSeconds()
+        {
+            while (!this.CancellationToken.Token.IsCancellationRequested)
+            {
+                while(true)
+                { 
+                PlaybackState++;
+                
+                Thread.Sleep(1000);
+                }
+            }
+        }
+
         #endregion
 
         #region Filesystem Interactions
@@ -308,6 +325,7 @@ namespace BBPlayer
             CancellationToken.Cancel();
             PlaybackTask.Wait();
             FileTask.Wait();
+            PlaybackStateTask.Wait();
         }
         private void bt_AddFolder(object sender, RoutedEventArgs e)
         {
@@ -454,5 +472,11 @@ namespace BBPlayer
         private void StopSong() { this.outputDevice.Stop(); }
         #endregion
 
+
+        
+
+        
+
+        
     }
 }
