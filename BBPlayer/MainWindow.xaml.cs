@@ -10,6 +10,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using TagLib;
 
 namespace BBPlayer
@@ -273,13 +274,39 @@ namespace BBPlayer
 
        private void PlayingStateSeconds()
         {
-            while (!this.CancellationToken.Token.IsCancellationRequested)
-            {
-                while(true)
-                { 
-                PlaybackState++;
-                
-                Thread.Sleep(1000);
+            
+                while (!this.CancellationToken.Token.IsCancellationRequested)
+                {
+                if (status != null)
+                {
+                        int jelenlegislidermax = 0;
+                        int playbackstate = PlaybackState;
+                    
+                    while (SongInFocus.Key != null && playbackstate != (int)SongInFocus.Value.Duration.TotalSeconds)
+                    {
+                        
+                        if(jelenlegislidermax != (int)SongInFocus.Value.Duration.TotalSeconds)
+                        {
+                            int slidernum = (int)SongInFocus.Value.Duration.TotalSeconds;
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                Slider.Maximum = slidernum;
+                            });
+                            jelenlegislidermax = slidernum;
+                        }
+                        PlaybackState++;
+                        playbackstate++;
+                        decimal minute = Math.Floor((decimal)playbackstate / 60);
+                        string csere = $"{minute}:{playbackstate - minute * 60}";
+                        
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            
+                            status.Content = csere;
+                            Slider.Value = playbackstate;
+                        });
+                        Thread.Sleep(1000);
+                    }
                 }
             }
         }
