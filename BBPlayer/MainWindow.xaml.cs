@@ -296,8 +296,17 @@ namespace BBPlayer
                         }
                         PlaybackState++;
                         playbackstate++;
+                        string csere;
                         decimal minute = Math.Floor((decimal)playbackstate / 60);
-                        string csere = $"{minute}:{playbackstate - minute * 60}";
+                        if(playbackstate - minute * 60 < 10)
+                        {
+                            csere = $"{minute}:0{playbackstate - minute * 60}";
+                        }
+                        else
+                        {
+                            csere = $"{minute}:{playbackstate - minute * 60}";
+                        }
+                        
                         
                         Application.Current.Dispatcher.Invoke(() =>
                         {
