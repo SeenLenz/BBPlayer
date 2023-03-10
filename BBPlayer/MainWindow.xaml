@@ -6,6 +6,24 @@
         xmlns:userControls="clr-namespace:BBPlayer"
         mc:Ignorable="d"
         Height="450" Width="800" WindowStyle="None">
+    <Window.Resources>
+
+        <Style x:Key="Title" TargetType="Button">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="ExtraBold" />
+            <Setter Property="Background" Value="#00000000"/>
+            <Setter Property="Height" Value="50px"/>
+            <Setter Property="FontFamily" Value="Comic sans MS"/>
+            <Setter Property="Foreground" Value="#6E6E6E"/>
+            <Setter Property="Content" Value="BBPlayer :)"/>
+            <Setter Property="BorderThickness" Value="0px"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
+            <Setter Property="Padding" Value="0,0,0,0"/>
+
+        </Style>
+
+    </Window.Resources>
     <Border CornerRadius="20,20,20,20" Background="#FF151515">
         <Grid >
             <Grid.ColumnDefinitions>
@@ -25,7 +43,7 @@
                 </Rectangle.Fill>
             </Rectangle>
             <StackPanel Background="Black" Opacity="0.8" Grid.RowSpan="2">
-                <Button/>
+                <Button Style="{StaticResource Title}"/>
             </StackPanel>
             <StackPanel Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
             </StackPanel>
