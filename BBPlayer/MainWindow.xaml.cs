@@ -40,6 +40,8 @@ namespace BBPlayer
         public bool isReplay = false;
         public bool isReplayInfinite = false;
         public int PlaybackState = 0;
+        public bool Pause = false;
+        
 
         private Config _config;
         public Config Config
@@ -207,6 +209,11 @@ namespace BBPlayer
             
 
             InitializeComponent();
+            if(status != null)
+            {
+                Slider.IsEnabled = false;
+                status.IsEnabled = false;
+            }
             Closing += WindowEventClose;
         }
 
@@ -277,14 +284,21 @@ namespace BBPlayer
             
                 while (!this.CancellationToken.Token.IsCancellationRequested)
                 {
+
                 if (status != null)
                 {
                         int jelenlegislidermax = 0;
                     
                     while (SongInFocus.Key != null && PlaybackState != (int)SongInFocus.Value.Duration.TotalSeconds)
                     {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            Slider.IsEnabled = true;
+                            status.IsEnabled = true;
+                        });
                         
-                        if(jelenlegislidermax != (int)SongInFocus.Value.Duration.TotalSeconds)
+
+                        if (jelenlegislidermax != (int)SongInFocus.Value.Duration.TotalSeconds)
                         {
                             int slidernum = (int)SongInFocus.Value.Duration.TotalSeconds;
                             Application.Current.Dispatcher.Invoke(() =>
@@ -405,6 +419,7 @@ namespace BBPlayer
         private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
         private void bt_Stop(object sender, RoutedEventArgs e) { StopSong(); }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
+        private void bt_Replay(object sender, RoutedEventArgs e){ Replay(); }
         #endregion
 
         #region Event Handlers
@@ -500,17 +515,40 @@ namespace BBPlayer
         private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
         private void PlaySong()
         {
+            if (true)
+            {
             Playback_MessageQueue.Add(this.SongInFocus.Value);
             this.PlaybackStateTask = Task.Run(() => PlayingStateSeconds());
+            }
+            else
+            {
+
+            }
         }
-        private void PauseSong() { }
+        private void PauseSong() 
+        {
+            
+            if (Pause == false)
+            {
+                Pause = true;
+                //megáll a lejátszás
+            }
+            else
+            {
+                Pause = false;
+                //folytatja
+            }
+        }
         private void StopSong() { this.outputDevice.Stop(); }
+
+
+
+
+
+
         #endregion
 
-
-        
-
-        
+  
 
         
     }
