@@ -204,7 +204,7 @@ namespace BBPlayer
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
             this.FileTask = Task.Run(() => BackgroundTask());
-            this.PlaybackStateTask = Task.Run(() => PlayingStateSeconds());
+            
 
             InitializeComponent();
             Closing += WindowEventClose;
@@ -280,9 +280,8 @@ namespace BBPlayer
                 if (status != null)
                 {
                         int jelenlegislidermax = 0;
-                        int playbackstate = PlaybackState;
                     
-                    while (SongInFocus.Key != null && playbackstate != (int)SongInFocus.Value.Duration.TotalSeconds)
+                    while (SongInFocus.Key != null && PlaybackState != (int)SongInFocus.Value.Duration.TotalSeconds)
                     {
                         
                         if(jelenlegislidermax != (int)SongInFocus.Value.Duration.TotalSeconds)
@@ -295,16 +294,15 @@ namespace BBPlayer
                             jelenlegislidermax = slidernum;
                         }
                         PlaybackState++;
-                        playbackstate++;
                         string csere;
-                        decimal minute = Math.Floor((decimal)playbackstate / 60);
-                        if(playbackstate - minute * 60 < 10)
+                        decimal minute = Math.Floor((decimal)PlaybackState / 60);
+                        if(PlaybackState - minute * 60 < 10)
                         {
-                            csere = $"{minute}:0{playbackstate - minute * 60}";
+                            csere = $"{minute}:0{PlaybackState - minute * 60}";
                         }
                         else
                         {
-                            csere = $"{minute}:{playbackstate - minute * 60}";
+                            csere = $"{minute}:{PlaybackState - minute * 60}";
                         }
                         
                         
@@ -312,7 +310,7 @@ namespace BBPlayer
                         {
                             
                             status.Content = csere;
-                            Slider.Value = playbackstate;
+                            Slider.Value = PlaybackState;
                         });
                         Thread.Sleep(1000);
                     }
@@ -503,6 +501,7 @@ namespace BBPlayer
         private void PlaySong()
         {
             Playback_MessageQueue.Add(this.SongInFocus.Value);
+            this.PlaybackStateTask = Task.Run(() => PlayingStateSeconds());
         }
         private void PauseSong() { }
         private void StopSong() { this.outputDevice.Stop(); }
