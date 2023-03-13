@@ -18,11 +18,40 @@
             <Setter Property="Content" Value="BBPlayer :)"/>
             <Setter Property="BorderThickness" Value="0px"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
+            <Setter Property="Margin" Value="10px,0px , 0px ,10px"/>
             <Setter Property="Padding" Value="0,0,0,0"/>
 
         </Style>
-
+        <Style x:Key="MenuButton1" TargetType="Button">
+            <Setter Property="Content" Value="Local Files"/>
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+            <Setter Property="Background" Value="#00000000"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="Foreground" Value="#6E6E6E"/>
+            <Setter Property="Margin" Value="20px,0px , 0px ,10px"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
+        </Style>
+        <Style x:Key="MenuButton2" TargetType="Button">
+            <Setter Property="Content" Value="Playlists"/>
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+            <Setter Property="Background" Value="#00000000"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="Foreground" Value="#6E6E6E"/>
+            <Setter Property="Margin" Value="20px,0px , 0px ,10px"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
+        </Style>
+        <Style x:Key="MenuButton3" TargetType="Button">
+            <Setter Property="Content" Value="Favourites"/>
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+            <Setter Property="Background" Value="#00000000"/>
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="Foreground" Value="#6E6E6E"/>
+            <Setter Property="Margin" Value="20px,0px , 0px ,10px"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
+        </Style>
     </Window.Resources>
     <Border CornerRadius="20,20,20,20" Background="#FF151515">
         <Grid >
@@ -31,7 +60,7 @@
                 <ColumnDefinition Width="8*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="10*"/>
+                <RowDefinition Height="8*"/>
                 <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
             <Rectangle Grid.ColumnSpan="2" Grid.RowSpan="2">
@@ -44,6 +73,9 @@
             </Rectangle>
             <StackPanel Background="Black" Opacity="0.8" Grid.RowSpan="2">
                 <Button Style="{StaticResource Title}"/>
+                <Button Style="{StaticResource MenuButton1}"/>
+                <Button Style="{StaticResource MenuButton2}"/>
+                <Button Style="{StaticResource MenuButton3}"/>
             </StackPanel>
             <StackPanel Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
             </StackPanel>
