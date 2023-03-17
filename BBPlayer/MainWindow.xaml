@@ -55,19 +55,21 @@
             <Setter Property="Height" Value="80px"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="Grid.Row" Value="2"/>
-            <Setter Property="Margin" Value="10px, 0px, 0, 0"/>
+            <Setter Property="Margin" Value="10px, 0px, 10px, 0px"/>
         </Style>
         <Style x:Key="MusicTitle" TargetType="Label" >
             <Setter Property="Content" Value="AKC MISI - A szeretet él"/>
-            <Setter Property="Margin" Value="10px, 10px , 0px , 50px"/>
+            <Setter Property="Margin" Value="0, 10px , 0px , 20px"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="Height" Value="20px"/>
-            <Setter Property="Width" Value="100px"/>
+            <Setter Property="Height" Value="25px"/>
+            <Setter Property="Width" Value="200px"/>
             <Setter Property="FontSize" Value="12px"/>
             <Setter Property="FontFamily" Value="Comic Sans MS"/>
             <Setter Property="Foreground" Value="#6E6E6E"/>
-
-
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <Style x:Key="TimeSlider" TargetType="Slider">
+            <Setter Property="Width" Value="350px"/>
         </Style>
 
     </Window.Resources>
@@ -97,10 +99,10 @@
             </StackPanel>
             <StackPanel Grid.Row="2" Grid.ColumnSpan="2" FlowDirection="LeftToRight">
                 <Image Style="{StaticResource AlbumCover}"/>
-                <Label Style="{StaticResource MusicTitle}"/>
             </StackPanel>
             <StackPanel Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
-  
+                <Label Style="{StaticResource MusicTitle}"/>
+                <Slider Style="{StaticResource TimeSlider}"/>
             </StackPanel>
 
         </Grid>
