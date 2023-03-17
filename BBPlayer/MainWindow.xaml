@@ -28,7 +28,6 @@
             <Setter Property="Background" Value="#00000000"/>
             <Setter Property="BorderBrush" Value="Black"/>
             <Setter Property="Foreground" Value="#6E6E6E"/>
-            <Setter Property="Margin" Value="20px,0px , 0px ,10px"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
         </Style>
@@ -38,7 +37,6 @@
             <Setter Property="Background" Value="#00000000"/>
             <Setter Property="BorderBrush" Value="Black"/>
             <Setter Property="Foreground" Value="#6E6E6E"/>
-            <Setter Property="Margin" Value="20px,0px , 0px ,10px"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
         </Style>
@@ -48,10 +46,30 @@
             <Setter Property="Background" Value="#00000000"/>
             <Setter Property="BorderBrush" Value="Black"/>
             <Setter Property="Foreground" Value="#6E6E6E"/>
-            <Setter Property="Margin" Value="20px,0px , 0px ,10px"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
             <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
         </Style>
+        <Style x:Key="AlbumCover" TargetType="Image">
+            <Setter Property="Source" Value="img/Sanyi.png"/>
+            <Setter Property="Grid.Row" Value="2"/>
+            <Setter Property="Height" Value="80px"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Grid.Row" Value="2"/>
+            <Setter Property="Margin" Value="10px, 0px, 0, 0"/>
+        </Style>
+        <Style x:Key="MusicTitle" TargetType="Label" >
+            <Setter Property="Content" Value="AKC MISI - A szeretet él"/>
+            <Setter Property="Margin" Value="10px, 10px , 0px , 50px"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Height" Value="20px"/>
+            <Setter Property="Width" Value="100px"/>
+            <Setter Property="FontSize" Value="12px"/>
+            <Setter Property="FontFamily" Value="Comic Sans MS"/>
+            <Setter Property="Foreground" Value="#6E6E6E"/>
+
+
+        </Style>
+
     </Window.Resources>
     <Border CornerRadius="20,20,20,20" Background="#FF151515">
         <Grid >
@@ -63,7 +81,7 @@
                 <RowDefinition Height="8*"/>
                 <RowDefinition Height="2*"/>
             </Grid.RowDefinitions>
-            <Rectangle Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <Rectangle Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="0,-4,0,4">
                 <Rectangle.Fill>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                         <GradientStop Color="Purple" Offset="0.0"/>
@@ -77,7 +95,12 @@
                 <Button Style="{StaticResource MenuButton2}"/>
                 <Button Style="{StaticResource MenuButton3}"/>
             </StackPanel>
+            <StackPanel Grid.Row="2" Grid.ColumnSpan="2" FlowDirection="LeftToRight">
+                <Image Style="{StaticResource AlbumCover}"/>
+                <Label Style="{StaticResource MusicTitle}"/>
+            </StackPanel>
             <StackPanel Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
+  
             </StackPanel>
 
         </Grid>
