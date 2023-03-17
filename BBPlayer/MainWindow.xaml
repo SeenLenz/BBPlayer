@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:userControls="clr-namespace:BBPlayer"
+        xmlns:uc="clr-namespace:BBPlayer"
+       xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" WindowStyle="ThreeDBorderWindow">
     <Grid>
@@ -23,13 +24,10 @@
             <Button Content="Next" Width="60px" Height="20px" Margin="5" Click="bt_Next"></Button>
             <Button Content="ListDirs" Width="60px" Height="20px" Margin="5" Click="bt_ListDirectories"></Button>
         </StackPanel>
-        <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Center" Height="800"/>
+        <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Center" Height="78"/>
         <Button Content="Add File" Width="60px" Height="20px" Click="bt_AddFolder" ></Button>
-        <StackPanel Grid.Column="0" Grid.ColumnSpan="2"/>
-        <ScrollViewer Grid.Column="1">
-            <StackPanel x:Name="SongPanel">
-            </StackPanel>
-        </ScrollViewer>
+        <WindowsFormsHost x:Name="SongContainer">
 
+        </WindowsFormsHost>
     </Grid>
 </Window>

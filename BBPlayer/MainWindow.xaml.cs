@@ -10,13 +10,18 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using TagLib;
+using System.Windows.Controls;
+using System.Data;
+using WForms = System.Windows.Forms;
+using System.Windows.Forms.Integration;
 
 namespace BBPlayer
 {
     public partial class MainWindow : Window
     {
         #region Properties
+        private ListViewItem[] SongCache; //array to cache items for the virtual list
+        private int firstCacheItem;
 
         private WaveOutEvent outputDevice = new WaveOutEvent();
         private AudioFileReader audioFile;
@@ -53,7 +58,7 @@ namespace BBPlayer
             get { return ++_id; }
             set { _id = value; }
         }
-
+        
 
         private string[] _folders = new string[] { };
         public string[] Folders
@@ -69,6 +74,8 @@ namespace BBPlayer
             }
         }
 
+        private WForms.ListView SongListView = new WForms.ListView();
+
         //DO NOT TOUCH!!! This section contains the properties for MainWindow required for BackgroundTask
         public BlockingCollection<Song> Playback_MessageQueue = new BlockingCollection<Song>();
         private CancellationTokenSource CancellationToken = new CancellationTokenSource();
@@ -83,6 +90,7 @@ namespace BBPlayer
         #region Threads
         public MainWindow()
         {
+
             //Here Every bin File gets deserialized (file beolvasas) 
             //In the first try block we look if the file exists 
             //in the second try block we handle the file empty exceptio
@@ -200,7 +208,13 @@ namespace BBPlayer
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
             this.FileTask = Task.Run(() => BackgroundTask());
+            
+            this.SongListView.VirtualMode = true;
+            this.SongListView.RetrieveVirtualItem += new WForms.RetrieveVirtualItemEventHandler(SongListView_RetrieveVirtualItem);
+            this.SongListView.CacheVirtualItems += new WForms.CacheVirtualItemsEventHandler(SongListView_CacheVirtualItems);
+            this.SongListView.SearchForVirtualItem += new WForms.SearchForVirtualItemEventHandler(SongListView_SearchForVirtualItem);
             InitializeComponent();
+            SongContainer.Child = SongListView;
             Closing += WindowEventClose;
         }
 
@@ -257,6 +271,9 @@ namespace BBPlayer
                     {
                         this.SongInFocus = this.SongList[SongIndex];
                     }
+                    Application.Current.Dispatcher.Invoke(() => {
+                        this.SongListView.Refresh();
+                    });
 
                     this.Files = new List<String> { };
 
@@ -285,7 +302,6 @@ namespace BBPlayer
                     row.SongYear = $"{MediaLibrary[name].Year}";
                     row.SongGenre = $"{MediaLibrary[name].Genre}";
                     row.SongDuration = $"{MediaLibrary[name].Duration}";
-                    SongPanel.Children.Add(row);
                 });
 
                 if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
@@ -309,6 +325,19 @@ namespace BBPlayer
         #endregion
 
         #region Gui Event Handlers
+
+        private void SongListView_RetrieveVirtualItem(object sender, WForms.RetrieveVirtualItemEventArgs e)
+        {
+            
+        Song song = SongList[e.ItemIndex].Value;
+
+        WForms.ListViewItem item = new WForms.ListViewItem(song.Title);
+        }
+        private void SongListView_CacheVirtualItems(object sender, WForms.CacheVirtualItemsEventArgs e)
+        { }
+        private void SongListView_SearchForVirtualItem(object sender, WForms.SearchForVirtualItemEventArgs e)
+        { }
+
         private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Closing -= WindowEventClose;
