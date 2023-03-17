@@ -290,7 +290,7 @@ namespace BBPlayer
                 {
                        
                     
-                    while (SongInFocus.Key != null && PlaybackState != (int)SongInFocus.Value.Duration.TotalSeconds && Pause == false)
+                    while (SongInFocus.Key != null && this.PlaybackState != (int)SongInFocus.Value.Duration.TotalSeconds && this.Pause == false)
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
@@ -308,16 +308,16 @@ namespace BBPlayer
                             });
                             jelenlegislidermax = slidernum;
                         }
-                        PlaybackState+= 1;
+                        this.PlaybackState += 1;
                         string csere;
-                        decimal minute = Math.Floor((decimal)PlaybackState / 60);
-                        if(PlaybackState - minute * 60 < 10)
+                        decimal minute = Math.Floor((decimal)this.PlaybackState / 60);
+                        if(this.PlaybackState - minute * 60 < 10)
                         {
-                            csere = $"{minute}:0{PlaybackState - minute * 60}";
+                            csere = $"{minute}:0{this.PlaybackState - minute * 60}";
                         }
                         else
                         {
-                            csere = $"{minute}:{PlaybackState - minute * 60}";
+                            csere = $"{minute}:{this.PlaybackState - minute * 60}";
                         }
                         
                         
@@ -325,7 +325,7 @@ namespace BBPlayer
                         {
                             
                             status.Content = csere;
-                            Slider.Value = PlaybackState;
+                            Slider.Value = this.PlaybackState;
                         });
                         Thread.Sleep(1000);
                     }
@@ -508,49 +508,52 @@ namespace BBPlayer
 
         #region Playback Actions
         private void Replay() {
-            if(isReplay == false)
+            if(this.isReplay == false)
             {
-                isReplay = true;
+                this.isReplay = true;
                 
             }
-            else if( isReplay == true)
+            else if(this.isReplay == true)
             {
-                isReplay = false;
-                isReplayInfinite = true;
+                this.isReplay = false;
+                this.isReplayInfinite = true;
             }
             else
             {
-                isReplayInfinite = false;
+                this.isReplayInfinite = false;
                 
             }
         }
         private void Shuffle() { }
-        private void PreviousSong() { this.SongInFocus = this.SongList[--SongIndex]; }
-        private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
+        private void PreviousSong() { 
+            this.SongInFocus = this.SongList[--SongIndex];
+            //PlaySong(); 
+        }
+        private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; /*PlaySong();*/ }
         private void PlaySong()
         {
             if (this.PlaybackStateTask == null || this.PlaybackStateTask.Status != TaskStatus.Running)
             {
-            Playback_MessageQueue.Add(this.SongInFocus.Value);
+            this.Playback_MessageQueue.Add(this.SongInFocus.Value);
             this.PlaybackStateTask = Task.Run(() => PlayingStateSeconds());
             }
             else
             {
-                Pause = false;
+                this.Pause = false;
                 int sampleRate = audioFile.WaveFormat.SampleRate;
                 int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
                 int channels = audioFile.WaveFormat.Channels;
                 this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
                 this.outputDevice.Init(audioFile);
-                outputDevice.Play();
+                this.outputDevice.Play();
             }
         }
         private void PauseSong() 
         {
             
-            if (Pause == false)
+            if (this.Pause == false)
             {
-                Pause = true;
+                this.Pause = true;
                 //megáll a lejátszás
                 decimal minute = Math.Floor((decimal)PlaybackState / 60);
                 
@@ -558,20 +561,20 @@ namespace BBPlayer
                     string min = temp.Split(':')[0];
                     string sec = temp.Split(':')[1];
                     int time = int.Parse(min) * 60 + int.Parse(sec);
-                    státusz = time;
-                    outputDevice.Stop();
+                    this.státusz = time;
+                    this.outputDevice.Stop();
 
                 
             }
-            else if(Pause == true)
+            else if(this.Pause == true)
             {
-                Pause = false;
+                this.Pause = false;
                 int sampleRate = audioFile.WaveFormat.SampleRate;
                 int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
                 int channels = audioFile.WaveFormat.Channels;
                 this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
                 this.outputDevice.Init(audioFile);
-                outputDevice.Play();
+                this.outputDevice.Play();
             }
         }
         private void StopSong() { this.outputDevice.Stop(); }
