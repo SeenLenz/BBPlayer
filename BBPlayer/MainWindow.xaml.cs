@@ -553,30 +553,25 @@ namespace BBPlayer
                 Pause = true;
                 //megáll a lejátszás
                 decimal minute = Math.Floor((decimal)PlaybackState / 60);
-                if (minute < 1)
-                {
-                    string cstate = status.Content.ToString().Replace(':', ' ').Replace('0', ' ');
-                    státusz = int.Parse(cstate);
-
+                
+                    string temp = status.Content.ToString();
+                    string min = temp.Split(':')[0];
+                    string sec = temp.Split(':')[1];
+                    int time = int.Parse(min) * 60 + int.Parse(sec);
+                    státusz = time;
                     outputDevice.Stop();
 
-                }
-                else
-                {
-                    státusz = int.Parse(status.Content.ToString().Replace(':', ','));
-
-                    outputDevice.Stop();
-                }
+                
             }
             else if(Pause == true)
             {
-                //Pause = false;
-                //int sampleRate = audioFile.WaveFormat.SampleRate;
-                //int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
-                //int channels = audioFile.WaveFormat.Channels;
-                //this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
-                //this.outputDevice.Init(audioFile);
-                //outputDevice.Play();
+                Pause = false;
+                int sampleRate = audioFile.WaveFormat.SampleRate;
+                int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
+                int channels = audioFile.WaveFormat.Channels;
+                this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
+                this.outputDevice.Init(audioFile);
+                outputDevice.Play();
             }
         }
         private void StopSong() { this.outputDevice.Stop(); }
