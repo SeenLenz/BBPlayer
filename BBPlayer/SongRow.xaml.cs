@@ -34,6 +34,18 @@ namespace BBPlayer
             }
         }
 
+        private string _IsGridVisible;
+
+        public string IsGridVisible
+        {
+            get { return _IsGridVisible; }
+            set
+            {
+                _IsGridVisible = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsGridVisible"));
+            }
+        }
+
         private string _SongArtist;
 
         public string SongArtist

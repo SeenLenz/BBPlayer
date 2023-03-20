@@ -14,20 +14,26 @@ using System.Windows.Controls;
 using System.Data;
 using WForms = System.Windows.Forms;
 using System.Windows.Forms.Integration;
+using System.Windows.Controls.Primitives;
+using System.Xml.Linq;
 
 namespace BBPlayer
 {
     public partial class MainWindow : Window
     {
         #region Properties
-        private ListViewItem[] SongCache; //array to cache items for the virtual list
-        private int firstCacheItem;
+
+        public int StartIndex = 0;
+        public int PageSize = 30;
+        public int CurrentCount = 0;
+        public int TotalCount = 0;
+        public double ScrollDifference = 0;
 
         private WaveOutEvent outputDevice = new WaveOutEvent();
         private AudioFileReader audioFile;
 
-        private KeyValuePair<string, Song> SongInFocus;
-        private List<KeyValuePair<string, Song>> SongList = new List<KeyValuePair<string, Song>> { };
+        private Song SongInFocus;
+        private List<Song> SongList = new List<Song> { };
         private int SongIndex = 0;
 
         public BinaryFormatter formatter = new BinaryFormatter();
@@ -204,17 +210,11 @@ namespace BBPlayer
                 using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
                 this.Playlists = new Dictionary<string, Playlist>();
             }
+            InitializeComponent();
 
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
             this.FileTask = Task.Run(() => BackgroundTask());
-            
-            this.SongListView.VirtualMode = true;
-            this.SongListView.RetrieveVirtualItem += new WForms.RetrieveVirtualItemEventHandler(SongListView_RetrieveVirtualItem);
-            this.SongListView.CacheVirtualItems += new WForms.CacheVirtualItemsEventHandler(SongListView_CacheVirtualItems);
-            this.SongListView.SearchForVirtualItem += new WForms.SearchForVirtualItemEventHandler(SongListView_SearchForVirtualItem);
-            InitializeComponent();
-            SongContainer.Child = SongListView;
             Closing += WindowEventClose;
         }
 
@@ -250,10 +250,11 @@ namespace BBPlayer
                 this.ParseFiles();
                 this.Files = new List<String> { };
 
-                this.SongList = this.MediaLibrary.OrderBy(e => e.Value.ID).ToList();
+                this.SongList.OrderBy(e => e.ID).ToList();
 
                 this.SongInFocus = this.SongList[SongIndex];
             }
+   
             while (!this.CancellationToken.Token.IsCancellationRequested)
             {
 
@@ -271,9 +272,6 @@ namespace BBPlayer
                     {
                         this.SongInFocus = this.SongList[SongIndex];
                     }
-                    Application.Current.Dispatcher.Invoke(() => {
-                        this.SongListView.Refresh();
-                    });
 
                     this.Files = new List<String> { };
 
@@ -293,16 +291,35 @@ namespace BBPlayer
             {
                 string name = file.Split(@"\").Last();
                 this.MediaLibrary.TryAdd(name, new Song(file, ID));
-                this.SongList.Add(new KeyValuePair<string, Song>(name, new Song(file, ID)));
+                Song temp   = new Song(file, ID); 
+                this.SongList.Add(temp);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    SongRow row = new SongRow();
-                    row.SongTitle = $"{MediaLibrary[name].Title}";
-                    row.SongArtist = $"{MediaLibrary[name].Artist}";
-                    row.SongYear = $"{MediaLibrary[name].Year}";
-                    row.SongGenre = $"{MediaLibrary[name].Genre}";
-                    row.SongDuration = $"{MediaLibrary[name].Duration}";
+                    SongPanel.Items.Add(temp);
                 });
+                //if (this.CurrentCount <= this.PageSize)
+                //{
+                //    CurrentCount++;
+                //    Application.Current.Dispatcher.Invoke(() => {
+                //        SongRow row = new SongRow();
+                //        row.Name = $"id_{MediaLibrary[name].ID}";
+                //        row.SongTitle = $"{MediaLibrary[name].Title}";
+                //        row.SongArtist = $"{MediaLibrary[name].Artist}";
+                //        row.SongYear = $"{MediaLibrary[name].Year}";
+                //        row.SongGenre = $"{MediaLibrary[name].Genre}";
+                //        row.SongDuration = $"{MediaLibrary[name].Duration}";
+                //        SongPanel.Children.Add(row);
+                //    });
+                //}
+                //else
+                //{
+                //    Application.Current.Dispatcher.Invoke(() => {
+                //        Placeholder row = new Placeholder();
+                //        row.Name = $"id_{MediaLibrary[name].ID}";
+                //        SongPanel.Children.Add(row);
+                //    });
+                //}
+
 
                 if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
                 {
@@ -326,17 +343,7 @@ namespace BBPlayer
 
         #region Gui Event Handlers
 
-        private void SongListView_RetrieveVirtualItem(object sender, WForms.RetrieveVirtualItemEventArgs e)
-        {
-            
-        Song song = SongList[e.ItemIndex].Value;
-
-        WForms.ListViewItem item = new WForms.ListViewItem(song.Title);
-        }
-        private void SongListView_CacheVirtualItems(object sender, WForms.CacheVirtualItemsEventArgs e)
-        { }
-        private void SongListView_SearchForVirtualItem(object sender, WForms.SearchForVirtualItemEventArgs e)
-        { }
+  
 
         private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -471,7 +478,7 @@ namespace BBPlayer
         private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
         private void PlaySong()
         {
-            Playback_MessageQueue.Add(this.SongInFocus.Value);
+            Playback_MessageQueue.Add(this.SongInFocus);
         }
         private void PauseSong() { }
         private void StopSong() { this.outputDevice.Stop(); }

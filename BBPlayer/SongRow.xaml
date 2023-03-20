@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BBPlayer"
              mc:Ignorable="d" d:DesignWidth="960" Height="35">
-    <Grid>
+    <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5*"></ColumnDefinition>
             <ColumnDefinition Width="4*"></ColumnDefinition>
