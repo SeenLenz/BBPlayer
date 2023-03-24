@@ -67,7 +67,7 @@
             <Setter Property="FontFamily" Value="Comic Sans MS"/>
             <Setter Property="Foreground" Value="#6E6E6E"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
-            
+
         </Style>
         <Style x:Key="SliderThumbStyle" TargetType="Thumb">
             <Setter Property="SnapsToDevicePixels" Value="true"/>
@@ -134,10 +134,30 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="albumRectangle" TargetType="Rectangle">
+            <Setter Property="Stroke" Value="#6E6E6E"/>
+            <Setter Property="StrokeThickness" Value="3"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Width" Value="126"/>
+            <Setter Property="Height" Value="160"/>
+            <Setter Property="Grid.Column" Value="1"/>
+            <Setter Property="Fill" Value="#CC000000"/>
+        </Style>
+        <Style x:Key="albumCoverRectangle" TargetType="Rectangle">
+            <Setter Property="Stroke" Value="#6E6E6E"/>
+            <Setter Property="StrokeThickness" Value="3"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Width" Value="95"/>
+            <Setter Property="Height" Value="95"/>
+            <Setter Property="Grid.Column" Value="1"/>
+        </Style>
+
 
     </Window.Resources>
     <Border CornerRadius="20,20,20,20" Background="#FF151515">
-        <Grid >
+        <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="8*"/>
@@ -150,7 +170,7 @@
                 <Rectangle.Fill>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                         <GradientStop Color="Purple" Offset="0.0"/>
-                        <GradientStop Color="Black" Offset="0.9"/>
+                        <GradientStop Color="Black" Offset="1"/>
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
@@ -161,12 +181,21 @@
                 <Button Style="{StaticResource MenuButton3}"/>
             </StackPanel>
             <StackPanel Grid.Row="2" Grid.ColumnSpan="2" FlowDirection="LeftToRight">
-                <Image Style="{StaticResource AlbumCover}"/>
+                <Image Style="{StaticResource AlbumCover}" Height="88"/>
             </StackPanel>
             <StackPanel Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
                 <Label Style="{StaticResource MusicTitle}"/>
                 <Slider Style="{StaticResource TimeSlider}"/>
             </StackPanel>
+            <Rectangle Margin="24,69,0,0" Style="{StaticResource albumRectangle}"/>
+            <Rectangle Margin="174,69,0,0" Style="{StaticResource albumRectangle}"/>
+            <Rectangle Margin="324,69,0,0" Style="{StaticResource albumRectangle}"/>
+            <Rectangle Margin="474,69,0,0" Style="{StaticResource albumRectangle}"/>
+            <Rectangle Margin="40,88,0,0"  Style="{StaticResource albumCoverRectangle}" />
+            <Rectangle Margin="190,88,0,0" Style="{StaticResource albumCoverRectangle}" />
+            <Rectangle Margin="340,85,0,0" Style="{StaticResource albumCoverRectangle}" />
+            <Rectangle Margin="490,88,0,0" Style="{StaticResource albumCoverRectangle}" />
+
 
         </Grid>
     </Border>

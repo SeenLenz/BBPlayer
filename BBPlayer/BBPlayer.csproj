@@ -13,4 +13,10 @@
     <PackageReference Include="WindowsAPICodePack" Version="7.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="img\Sanyi.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
