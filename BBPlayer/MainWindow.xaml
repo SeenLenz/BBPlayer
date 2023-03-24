@@ -29,7 +29,7 @@
             <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Stretch"/>
         </ScrollViewer>
         <Button Content="Add File" Width="60px" Height="20px" Click="bt_AddFolder" ></Button>
-        <ListView Name="SongPanel" Grid.Column="1"  ItemsSource="{Binding SongList}" VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple">
+        <ListView Name="SongPanel" Grid.Column="1" VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple">
             <ListView.ItemTemplate>
                 <DataTemplate DataType="local:Song">
                     <Grid Height="55" HorizontalAlignment="Stretch">

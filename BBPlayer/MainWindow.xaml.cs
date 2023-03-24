@@ -16,12 +16,15 @@ using WForms = System.Windows.Forms;
 using System.Windows.Forms.Integration;
 using System.Windows.Controls.Primitives;
 using System.Xml.Linq;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace BBPlayer
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window , INotifyPropertyChanged
     {
         #region Properties
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int StartIndex = 0;
         public int PageSize = 30;
@@ -33,7 +36,9 @@ namespace BBPlayer
         private AudioFileReader audioFile;
 
         private Song SongInFocus;
-        private List<Song> SongList = new List<Song> { };
+        private ObservableCollection<Song> SongList = new ObservableCollection<Song> { };
+
+
         private int SongIndex = 0;
 
         public BinaryFormatter formatter = new BinaryFormatter();
@@ -210,8 +215,30 @@ namespace BBPlayer
                 using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
                 this.Playlists = new Dictionary<string, Playlist>();
             }
-            InitializeComponent();
 
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./SongList.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.SongList = (ObservableCollection<Song>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.SongList = new ObservableCollection<Song>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./SongList.bin")) { }
+                this.Playlists = new Dictionary<string, Playlist>();
+            }
+            InitializeComponent();
+            SongPanel.ItemsSource = SongList;
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
             this.FileTask = Task.Run(() => BackgroundTask());
@@ -292,34 +319,11 @@ namespace BBPlayer
                 string name = file.Split(@"\").Last();
                 this.MediaLibrary.TryAdd(name, new Song(file, ID));
                 Song temp   = new Song(file, ID); 
-                this.SongList.Add(temp);
+                
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    SongPanel.Items.Add(temp);
+                    this.SongList.Add(temp);
                 });
-                //if (this.CurrentCount <= this.PageSize)
-                //{
-                //    CurrentCount++;
-                //    Application.Current.Dispatcher.Invoke(() => {
-                //        SongRow row = new SongRow();
-                //        row.Name = $"id_{MediaLibrary[name].ID}";
-                //        row.SongTitle = $"{MediaLibrary[name].Title}";
-                //        row.SongArtist = $"{MediaLibrary[name].Artist}";
-                //        row.SongYear = $"{MediaLibrary[name].Year}";
-                //        row.SongGenre = $"{MediaLibrary[name].Genre}";
-                //        row.SongDuration = $"{MediaLibrary[name].Duration}";
-                //        SongPanel.Children.Add(row);
-                //    });
-                //}
-                //else
-                //{
-                //    Application.Current.Dispatcher.Invoke(() => {
-                //        Placeholder row = new Placeholder();
-                //        row.Name = $"id_{MediaLibrary[name].ID}";
-                //        SongPanel.Children.Add(row);
-                //    });
-                //}
-
 
                 if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
                 {
