@@ -17,10 +17,9 @@
             </RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Width="598" >
-            <Button Content="Replay" Width="60px" Height="20px" Click="bt_Replay"/>
+            <Button x:Name="replay" Content="Replay off" Width="60px" Height="20px" Click="bt_Replay"/>
             <Button Content="Previous" Width="60px" Height="20px" Margin="5" Click="bt_Previous"/>
             <Button x:Name="bt_play" Content="Play" Width="60px" Height="20px" Margin="5" Click="bt_Play"/>
-            <Button Content="Stop" Width="60px" Height="20px" Margin="5" Click="bt_Stop"/>
             <Button Content="Next" Width="60px" Height="20px" Margin="5" Click="bt_Next"/>
             <Button Content="ListDirs" Width="60px" Height="20px" Margin="5" Click="bt_ListDirectories"/>
             <Slider x:Name="Slider" Width="150" Height="18" Maximum="200"  />

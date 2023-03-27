@@ -327,6 +327,10 @@ namespace BBPlayer
                             status.Content = csere;
                             Slider.Value = this.PlaybackState;
                         });
+                        if (PlaybackState == jelenlegislidermax)
+                        {
+                            Replay_OnSongEnd();
+                        }
                         Thread.Sleep(1000);
                     }
                 }
@@ -431,7 +435,6 @@ namespace BBPlayer
 
         }
         private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
-        private void bt_Stop(object sender, RoutedEventArgs e) { StopSong(); }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
         private void bt_Replay(object sender, RoutedEventArgs e){ Replay(); }
         #endregion
@@ -508,28 +511,71 @@ namespace BBPlayer
 
         #region Playback Actions
         private void Replay() {
-            if(this.isReplay == false)
+            if(this.isReplay == false && isReplayInfinite == false)
             {
                 this.isReplay = true;
+
+                replay.Content = "Replay on";
                 
             }
             else if(this.isReplay == true)
             {
                 this.isReplay = false;
                 this.isReplayInfinite = true;
+
+                replay.Content = "Inf Replay";
+
             }
             else
             {
                 this.isReplayInfinite = false;
+
+                replay.Content = "Replay off";
                 
+            }
+        }
+        private void Replay_OnSongEnd()
+        {
+            if(this.isReplay == true)
+            {
+                if (true) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
+                {
+                    PauseSong();
+                    this.SongInFocus = this.SongList[0];
+                    PlaySong();
+                }
+                else
+                {
+                    PauseSong();
+                    NextSong();
+                    PlaySong();
+                }
+            }
+            else if(this.isReplayInfinite == true)
+            {
+                PauseSong();
+                this.PlaybackState = 0;
+                this.státusz = 0;
+                this.audioFile.Position = 0;
+
+                PlaySong();
+            }
+            else
+            {
+                PauseSong();
             }
         }
         private void Shuffle() { }
         private void PreviousSong() { 
             this.SongInFocus = this.SongList[--SongIndex];
             //PlaySong(); 
+
         }
-        private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; /*PlaySong();*/ }
+        private void NextSong() { 
+            this.SongInFocus = this.SongList[++SongIndex]; 
+            /*PlaySong();*/ 
+
+        }
         private void PlaySong()
         {
             if (this.PlaybackStateTask == null || this.PlaybackStateTask.Status != TaskStatus.Running)
@@ -556,14 +602,15 @@ namespace BBPlayer
                 this.Pause = true;
                 //megáll a lejátszás
                 decimal minute = Math.Floor((decimal)PlaybackState / 60);
-                
+                Application.Current.Dispatcher.Invoke(() =>
+                {
                     string temp = status.Content.ToString();
                     string min = temp.Split(':')[0];
                     string sec = temp.Split(':')[1];
                     int time = int.Parse(min) * 60 + int.Parse(sec);
                     this.státusz = time;
                     this.outputDevice.Stop();
-
+                });
                 
             }
             else if(this.Pause == true)
@@ -577,11 +624,6 @@ namespace BBPlayer
                 this.outputDevice.Play();
             }
         }
-        private void StopSong() { this.outputDevice.Stop(); }
-
-
-
-
 
 
         #endregion
