@@ -438,6 +438,7 @@ namespace BBPlayer
         private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
         private void bt_Replay(object sender, RoutedEventArgs e){ Replay(); }
+        private void DragCompleted(object sender, RoutedEventArgs e) { }
         #endregion
 
         #region Event Handlers
@@ -469,6 +470,7 @@ namespace BBPlayer
         }
         public void OnPlaybackStopped(object sender, StoppedEventArgs e)
         {
+
         }
         #endregion
 
@@ -539,7 +541,7 @@ namespace BBPlayer
         {
             if(this.isReplay == true)
             {
-                if (true) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
+                if (this.SongInFocus.Value == this.SongList[SongList.Count].Value) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
                 {
                     PauseSong();
                     this.SongInFocus = this.SongList[0];
