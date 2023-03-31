@@ -42,7 +42,9 @@ namespace BBPlayer
         public int PlaybackState = 0;
         public bool Pause = false;
         public int státusz = 0;
-        
+        public int jelenlegislidermax = 0;
+        public string savedfilename;
+
 
         private Config _config;
         public Config Config
@@ -282,7 +284,6 @@ namespace BBPlayer
 
        private void PlayingStateSeconds()
         {
-            int jelenlegislidermax = 0;
             while ((!this.CancellationToken.Token.IsCancellationRequested))
             {
 
@@ -542,12 +543,14 @@ namespace BBPlayer
                 {
                     PauseSong();
                     this.SongInFocus = this.SongList[0];
+                    this.outputDevice.Dispose();
                     PlaySong();
                 }
                 else
                 {
                     PauseSong();
                     NextSong();
+                    this.outputDevice.Dispose();
                     PlaySong();
                 }
             }
@@ -566,14 +569,39 @@ namespace BBPlayer
             }
         }
         private void Shuffle() { }
-        private void PreviousSong() { 
-            this.SongInFocus = this.SongList[--SongIndex];
-            //PlaySong(); 
+        private void PreviousSong() {
+            if (SongIndex -1 != -1)
+            {
+                this.SongInFocus = this.SongList[--SongIndex];
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    this.státusz = 0;
+                    this.PlaybackState = 0;
+                    Slider.Value = 0;
+                    this.outputDevice.Stop();
+                    this.outputDevice.Dispose();
+                });
+                PlaySong();
+            }
 
         }
-        private void NextSong() { 
-            this.SongInFocus = this.SongList[++SongIndex]; 
-            /*PlaySong();*/ 
+        private void NextSong() {
+            if (SongIndex + 1 != SongList.Count)
+            {
+                this.SongInFocus = this.SongList[++SongIndex];
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    this.státusz = 0;
+                    this.PlaybackState = 0;
+                    Slider.Value = 0;
+                    this.outputDevice.Stop();
+                    this.outputDevice.Dispose();
+                });
+                this.PlaySong();
+            }
+            
 
         }
         private void PlaySong()
@@ -585,13 +613,30 @@ namespace BBPlayer
             }
             else
             {
-                this.Pause = false;
-                int sampleRate = audioFile.WaveFormat.SampleRate;
-                int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
-                int channels = audioFile.WaveFormat.Channels;
-                this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
-                this.outputDevice.Init(audioFile);
-                this.outputDevice.Play();
+                if (SongInFocus.Value.FileName == savedfilename)
+                {
+                    this.Pause = false;
+                    int sampleRate = audioFile.WaveFormat.SampleRate;
+                    int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
+                    int channels = audioFile.WaveFormat.Channels;
+                    this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
+
+                    this.outputDevice.Init(audioFile);
+                    this.outputDevice.Play();
+                }
+                else
+                {
+                    this.Playback_MessageQueue.Add(this.SongInFocus.Value);
+
+                    this.Pause = false;
+                    int sampleRate = audioFile.WaveFormat.SampleRate;
+                    int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
+                    int channels = audioFile.WaveFormat.Channels;
+                    this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
+
+                    this.outputDevice.Init(audioFile);
+                }
+               
             }
         }
         private void PauseSong() 
@@ -600,7 +645,6 @@ namespace BBPlayer
             if (this.Pause == false)
             {
                 this.Pause = true;
-                //megáll a lejátszás
                 decimal minute = Math.Floor((decimal)PlaybackState / 60);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -611,18 +655,19 @@ namespace BBPlayer
                     this.státusz = time;
                     this.outputDevice.Stop();
                 });
+                savedfilename = this.SongInFocus.Value.FileName;
                 
             }
-            else if(this.Pause == true)
-            {
-                this.Pause = false;
-                int sampleRate = audioFile.WaveFormat.SampleRate;
-                int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
-                int channels = audioFile.WaveFormat.Channels;
-                this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
-                this.outputDevice.Init(audioFile);
-                this.outputDevice.Play();
-            }
+            //else if(this.Pause == true)
+            //{
+            //    this.Pause = false;
+            //    int sampleRate = audioFile.WaveFormat.SampleRate;
+            //    int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
+            //    int channels = audioFile.WaveFormat.Channels;
+            //    this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
+            //    this.outputDevice.Init(audioFile);
+            //    this.outputDevice.Play();
+            //}
         }
 
 
