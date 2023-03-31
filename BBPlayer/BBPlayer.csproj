@@ -8,9 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Sanyi.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NAudio" Version="2.1.0" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
     <PackageReference Include="WindowsAPICodePack" Version="7.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Sanyi.png" />
   </ItemGroup>
 
   <ItemGroup>
