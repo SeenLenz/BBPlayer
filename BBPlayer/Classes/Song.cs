@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using TagLib;
 using System.Threading.Tasks;
 
 namespace BBPlayer.Classes
 {
-    public class Song : ObservableCollection<Song>
+    public class Song : ObservableCollection<Song> 
     {
         public TimeSpan Duration { get; set; }
-        private TagLib.File Raw { get; set; }
         public string Title { get; set; }
         public string Path { get; set; }
         public string Artist { get; set; }
@@ -24,19 +24,19 @@ namespace BBPlayer.Classes
 
         public Song(string Path, int ID)
         {
-            this.Raw = TagLib.File.Create(Path);
-            if (this.Raw.Tag != null)
+            Taglib Raw = TagLib.File.Create(Path);
+            if (Raw.Tag != null)
             {
                 this.Path = Path;
-                this.Duration = this.Raw.Properties.Duration;
-                this.Title = this.Raw.Tag.Title ?? Path.Split(@"\").Last().Split(".").First();
+                this.Duration = Raw.Properties.Duration;
+                this.Title = Raw.Tag.Title ?? Path.Split(@"\").Last().Split(".").First();
                 this.FileName = Path.Split(@"\").Last();
-                this.Artist = this.Raw.Tag.FirstPerformer ?? "Unknown Artis";
-                this.Album = this.Raw.Tag.Album ?? "Unknown Album";
-                this.Year = Convert.ToString(this.Raw.Tag.Year);
-                this.Genre = this.Raw.Tag.FirstGenre ?? "Unknown Genre";
-                this.Track = Convert.ToString(this.Raw.Tag.Track);
-                this.Disc = Convert.ToString(this.Raw.Tag.Disc);
+                this.Artist = Raw.Tag.FirstPerformer ?? "Unknown Artis";
+                this.Album = Raw.Tag.Album ?? "Unknown Album";
+                this.Year = Convert.ToString(Raw.Tag.Year);
+                this.Genre = Raw.Tag.FirstGenre ?? "Unknown Genre";
+                this.Track = Convert.ToString(Raw.Tag.Track);
+                this.Disc = Convert.ToString(Raw.Tag.Disc);
                 this.ID = ID;
             }
         }

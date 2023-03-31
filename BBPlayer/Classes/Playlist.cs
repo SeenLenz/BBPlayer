@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BBPlayer.Classes
 {
+    [Serializable]
     public class Playlist
     {
         public string Title { get; set; }

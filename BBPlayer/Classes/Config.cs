@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BBPlayer.Classes
 {
+    [Serializable]
     public class Config
     {
         public enum Themes
@@ -24,11 +25,14 @@ namespace BBPlayer.Classes
         public bool isDebug { get; set; }
         public bool isExperimental { get; set; }
 
+        public int uid { get; set; }
+
         public Config()
         {
             this.currentTheme = Themes.Dark;
             this.isDebug = false;
             this.isExperimental = false;
+            this.uid = 0;
         }
     }
 }
