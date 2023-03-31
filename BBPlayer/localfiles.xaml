@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:userControls="clr-namespace:BBPlayer"
         xmlns:local="clr-namespace:BBPlayer"
         mc:Ignorable="d"
         Title="" Height="450" Width="800" WindowStyle="None">
@@ -199,15 +200,23 @@
                 <Label Style="{StaticResource MusicTitle}" Panel.ZIndex="10" VerticalAlignment="Center"/>
                 <Slider Style="{StaticResource TimeSlider}" Panel.ZIndex="1" Grid.Column="0" Margin="0,0,0,2" Grid.Row="1"/>
             </Grid>
-            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical">
-                <StackPanel Orientation="Vertical" Height="">
-
+            <ScrollViewer Grid.Column="1">
+                <StackPanel>
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
+                    <userControls:SongRow />
                 </StackPanel>
-
-            </StackPanel>
-
-
-
+            </ScrollViewer>
         </Grid>
     </Border>
 </Window>
