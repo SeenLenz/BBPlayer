@@ -23,5 +23,10 @@ namespace BBPlayer
         {
             InitializeComponent();
         }
+
+        private void switchToMainMenu(object sender, RoutedEventArgs e)
+        {
+        
+        }
     }
 }

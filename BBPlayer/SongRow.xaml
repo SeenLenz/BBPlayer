@@ -12,14 +12,14 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label Name="lb_SongName" HorizontalAlignment="Center" VerticalAlignment="Center">lb_SongName</Label>
+        <Label Name="lb_SongName" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#6E6E6E">lb_SongName</Label>
         <StackPanel  Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Name="bt_PrevSong" Width="30" Height="30" Margin="10px 0px 0px 0px" Content="|◀"></Button>
             <Button Name="bt_PlaySong" Width="30" Height="30" Margin="10px 0px 0px 0px">></Button>
             <Button Name="bt_NextSong" Width="30" Height="30" Margin="10px 0px 0px 0px" Content="▶|"></Button>
             <Button Name="bt_SongOptions" Width="30" Height="30" Margin="10px 0px 0px 0px">...</Button>
         </StackPanel>
-        <Label Name="lb_SongLenght" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding SongLenght}"></Label>
-        <Label Name="lb_DateAdded" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">lb_DateAdded</Label>
+        <Label Name="lb_SongLenght" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding SongLenght}" Foreground="#6E6E6E"></Label>
+        <Label Name="lb_DateAdded" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#6E6E6E">lb_DateAdded</Label>
     </Grid>
 </UserControl>

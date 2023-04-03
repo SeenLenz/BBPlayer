@@ -50,7 +50,7 @@
             <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
         </Style>
         <Style x:Key="AlbumCover" TargetType="Image">
-            <Setter Property="Source" Value="img/Sanyi.png"/>
+            <Setter Property="Source" Value="/Sanyi.png"/>
             <Setter Property="Grid.Row" Value="2"/>
             <Setter Property="Height" Value="80px"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -175,7 +175,7 @@
             </Rectangle>
             <StackPanel Background="Black" Opacity="0.8" Grid.RowSpan="2">
                 <Button Style="{StaticResource Title}"/>
-                <Button Style="{StaticResource MenuButton1}"/>
+                <Button Style="{StaticResource MenuButton1}" Click="switchToLocalFiles"/>
                 <Button Style="{StaticResource MenuButton2}"/>
                 <Button Style="{StaticResource MenuButton3}"/>
             </StackPanel>
