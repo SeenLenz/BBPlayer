@@ -4,6 +4,7 @@ using NAudio.Wave;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -44,6 +45,7 @@ namespace BBPlayer
         public int státusz = 0;
         public int jelenlegislidermax = 0;
         public string savedfilename;
+        public bool isdragged = false;
 
 
         private Config _config;
@@ -320,14 +322,16 @@ namespace BBPlayer
                         {
                             csere = $"{minute}:{this.PlaybackState - minute * 60}";
                         }
-                        
-                        
-                        Application.Current.Dispatcher.Invoke(() =>
+
+                        if (isdragged == false)
                         {
-                            
-                            status.Content = csere;
-                            Slider.Value = this.PlaybackState;
-                        });
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+
+                                status.Content = csere;
+                                Slider.Value = this.PlaybackState;
+                            });
+                        }
                         if (PlaybackState == jelenlegislidermax)
                         {
                             Replay_OnSongEnd();
@@ -438,7 +442,9 @@ namespace BBPlayer
         private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
         private void bt_Replay(object sender, RoutedEventArgs e){ Replay(); }
-        private void DragCompleted(object sender, RoutedEventArgs e) { }
+        private void DragStarted(object sender, DragEventArgs e){ onDragStarted(); }
+        
+        private void DragCompleted(object sender, RoutedEventArgs e) { Drag(); }
         #endregion
 
         #region Event Handlers
@@ -541,7 +547,7 @@ namespace BBPlayer
         {
             if(this.isReplay == true)
             {
-                if (this.SongInFocus.Value == this.SongList[SongList.Count].Value) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
+                if (this.SongInFocus.Value == this.SongList[SongList.Count-1].Value) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
                 {
                     PauseSong();
                     this.SongInFocus = this.SongList[0];
@@ -551,7 +557,18 @@ namespace BBPlayer
                 else
                 {
                     PauseSong();
-                    NextSong();
+                    if (SongIndex + 1 != SongList.Count)
+                    {
+                        this.SongInFocus = this.SongList[++SongIndex];
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            this.státusz = 0;
+                            this.PlaybackState = 0;
+                            Slider.Value = 0;
+                        });
+                    }
+                        this.outputDevice.Stop();
                     this.outputDevice.Dispose();
                     PlaySong();
                 }
@@ -636,7 +653,9 @@ namespace BBPlayer
                     int channels = audioFile.WaveFormat.Channels;
                     this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
 
-                    this.outputDevice.Init(audioFile);
+
+
+                    //this.outputDevice.Init(audioFile);
                 }
                
             }
@@ -671,6 +690,37 @@ namespace BBPlayer
             //    this.outputDevice.Play();
             //}
         }
+        private void onDragStarted()
+        {
+            isdragged = true;
+        }
+        
+        private void Drag()
+        {
+            this.outputDevice.Stop();
+            isdragged = false;
+            int érték = Convert.ToInt32(Slider.Value);
+            int sampleRate = audioFile.WaveFormat.SampleRate;
+            int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
+            int channels = audioFile.WaveFormat.Channels;
+            this.audioFile.Position = SecondsToBytes(érték, sampleRate, channels, bitsPerSample);
+            this.outputDevice.Init(audioFile);
+            PlaybackState = érték;
+            Slider.Value = érték;
+            string csere;
+            decimal minute = Math.Floor((decimal)this.PlaybackState / 60);
+            if (this.PlaybackState - minute * 60 < 10)
+            {
+                csere = $"{minute}:0{this.PlaybackState - minute * 60}";
+            }
+            else
+            {
+                csere = $"{minute}:{this.PlaybackState - minute * 60}";
+            }
+            status.Content = csere;
+            this.outputDevice.Play();
+            
+        }
 
 
         #endregion
@@ -681,7 +731,9 @@ namespace BBPlayer
             long bytes = (long)(durationInSeconds * sampleRate * channels * bitsPerSample / 8);
             return bytes;
         }
+
         #endregion
 
+        
     }
 }

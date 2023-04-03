@@ -22,7 +22,7 @@
             <Button x:Name="bt_play" Content="Play" Width="60px" Height="20px" Margin="5" Click="bt_Play"/>
             <Button Content="Next" Width="60px" Height="20px" Margin="5" Click="bt_Next"/>
             <Button Content="ListDirs" Width="60px" Height="20px" Margin="5" Click="bt_ListDirectories"/>
-            <Slider x:Name="Slider" Width="150" Height="18" Maximum="200" Thumb.DragCompleted="DragCompleted" />
+            <Slider x:Name="Slider" Width="150" Height="18" Maximum="200" Thumb.DragCompleted="DragCompleted" DragEnter="DragStarted"/> 
             <Label x:Name="status" Content="0:00" />
         </StackPanel>
         <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Center" Height="800"/>
