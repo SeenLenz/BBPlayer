@@ -17,7 +17,7 @@ using System.Windows.Forms.Integration;
 using System.Windows.Controls.Primitives;
 using System.Xml.Linq;
 using System.ComponentModel;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Collections.ObjectModel;
 
 namespace BBPlayer
@@ -97,138 +97,43 @@ namespace BBPlayer
         public bool FileThreadRunning = true;
         private Task PlaybackTask;
         private Task FileTask;
+
+        string SongListPath = @"./SongList.json";
+        string ConfigPath = @"./Config.json";
+        string FoldersPath = @"./Folders.json";
+        string MediaLibraryPath = @"./MediaLibrary.json";
+        string AlbumsPath = @"./Albums.Json";
+        string PlaylistsPath = @"./Playlists.json";
+
         #endregion
 
         #region Threads
         public MainWindow()
         {
 
-            //Here Every bin File gets deserialized (file beolvasas) 
-            //In the first try block we look if the file exists 
-            //in the second try block we handle the file empty exceptio
-            //we do this for every .bin file (Config, MusicLibrary, Playlists, Albums, Folders)
-
         
-            //try
-            //{
-            //    using (Stream stream = System.IO.File.Open("./Config.bin", FileMode.Open))
-            //    {
-            //        try
-            //        {
-            //            this.Config = (Config)formatter.Deserialize(stream);
-            //            this.ID = this.Config.uid;
-            //        }
-            //        catch (System.Runtime.Serialization.SerializationException)
-            //        {
-            //            this.Config = new Config();
-            //        }
+            
 
-            //    }
-            //}
-            //catch (System.IO.FileNotFoundException)
-            //{
-            //    using (FileStream fileStream = System.IO.File.Create("./Config.bin")) { }
-            //    this.Config = new Config();
-            //}
+            if (File.Exists(ConfigPath))
+            {
+                string fileContent;
+                using (StreamReader streamReader = File.OpenText(ConfigPath))
+                {
+                    fileContent = streamReader.ReadToEnd();
+                }
+                this.Config = JsonSerializer.Deserialize<Config>(fileContent);
+            }
 
-            //try
-            //{
-            //    using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Open))
-            //    {
-            //        try
-            //        {
-            //            this.Folders = (string[])formatter.Deserialize(stream);
-            //        }
-            //        catch (System.Runtime.Serialization.SerializationException)
-            //        {
-            //            this.Folders = new string[] { };
-            //        }
-            //    }
-            //}
-            //catch (System.IO.FileNotFoundException)
-            //{
+            if (File.Exists(SongListPath))
+            {
+                string fileContent;
+                using (StreamReader streamReader = File.OpenText(SongListPath))
+                {
+                    fileContent = streamReader.ReadToEnd();
+                }
+                this.SongList = JsonSerializer.Deserialize<ObservableCollection<Song>>(fileContent);
+            }
 
-            //    using (FileStream fileStream = System.IO.File.Create("./Folders.bin")) { }
-            //    this.Folders = new string[] { };
-            //}
-
-            //try
-            //{
-            //    using (Stream stream = System.IO.File.Open("./MediaLibrary.bin", FileMode.Open))
-            //    {
-            //        try
-            //        {
-            //            this.MediaLibrary = (ConcurrentDictionary<string, Song>)formatter.Deserialize(stream);
-            //        }
-            //        catch (System.Runtime.Serialization.SerializationException)
-            //        {
-
-            //            this.MediaLibrary = new ConcurrentDictionary<string, Song>();
-            //        }
-
-            //    }
-            //}
-            //catch (System.IO.FileNotFoundException)
-            //{
-            //    using (FileStream fileStream = System.IO.File.Create("./MediaLibrary.bin")) { }
-            //    this.MediaLibrary = new ConcurrentDictionary<string, Song>();
-            //}
-
-            //try
-            //{
-            //    using (Stream stream = System.IO.File.Open("./Albums.bin", FileMode.Open))
-            //    {
-            //        try
-            //        {
-            //            this.Albums = (Dictionary<string, Album>)formatter.Deserialize(stream);
-            //        }
-            //        catch (System.Runtime.Serialization.SerializationException)
-            //        {
-
-            //            this.Albums = new Dictionary<string, Album>();
-            //        }
-
-            //    }
-            //}
-            //catch (System.IO.FileNotFoundException)
-            //{
-            //    using (FileStream fileStream = System.IO.File.Create("./Albums.bin")) { }
-            //    this.Albums = new Dictionary<string, Album>();
-            //}
-
-            //try
-            //{
-            //    using (Stream stream = System.IO.File.Open("./Playlists.bin", FileMode.Open))
-            //    {
-            //        try
-            //        {
-            //            this.Playlists = (Dictionary<string, Playlist>)formatter.Deserialize(stream);
-            //        }
-            //        catch (System.Runtime.Serialization.SerializationException)
-            //        {
-
-            //            this.Playlists = new Dictionary<string, Playlist>();
-            //        }
-
-            //    }
-            //}
-            //catch (System.IO.FileNotFoundException)
-            //{
-            //    using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
-            //    this.Playlists = new Dictionary<string, Playlist>();
-            //}
-
-            //try
-            //{
-            //    string json = File.ReadAllText(@"./SongList.json");
-            //    List<Song> songList = JsonConvert.DeserializeObject<List<Song>>(json);
-            //    this.SongList = new ObservableCollection<Song>(songList);
-            //}
-            //catch (FileNotFoundException)
-            //{
-
-            //    throw;
-            //}
 
             InitializeComponent();
             SongPanel.ItemsSource = SongList;
@@ -348,13 +253,11 @@ namespace BBPlayer
         private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
-            using (StreamWriter file = File.CreateText(@"./SongList.json"))
-            using (JsonTextWriter writer = new JsonTextWriter(file))
+            string SongListJson = JsonSerializer.Serialize(SongList);
+            using (StreamWriter streamWriter = File.CreateText(SongListPath))
             {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(writer, this.SongList);
+                streamWriter.Write(SongListJson);
             }
-
 
             Closing -= WindowEventClose;
             outputDevice.Stop();

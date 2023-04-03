@@ -24,7 +24,7 @@ namespace BBPlayer.Classes
 
         public Song(string Path, int ID)
         {
-            Taglib Raw = TagLib.File.Create(Path);
+            TagLib.File Raw = TagLib.File.Create(Path);
             if (Raw.Tag != null)
             {
                 this.Path = Path;
