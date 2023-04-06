@@ -14,428 +14,437 @@ using TagLib;
 
 namespace BBPlayer
 {
-    //public partial class MainWindow : Window
-    //{
-    //    #region Properties
+    public partial class MainWindow : Window
+    {
+        #region Properties
 
-    //    private WaveOutEvent outputDevice = new WaveOutEvent();
-    //    private AudioFileReader audioFile;
+        private WaveOutEvent outputDevice = new WaveOutEvent();
+        private AudioFileReader audioFile;
 
-    //    private KeyValuePair<string, Song> SongInFocus;
-    //    private List<KeyValuePair<string, Song>> SongList = new List<KeyValuePair<string, Song>> { };
-    //    private int SongIndex = 0;
+        private KeyValuePair<string, Song> SongInFocus;
+        private List<KeyValuePair<string, Song>> SongList = new List<KeyValuePair<string, Song>> { };
+        private int SongIndex = 0;
 
-    //    public BinaryFormatter formatter = new BinaryFormatter();
-    //    public List<String> SupportedFormats = new List<String> { ".mp3", ".wav", ".aiff", ".ogg" };
+        public BinaryFormatter formatter = new BinaryFormatter();
+        public List<String> SupportedFormats = new List<String> { ".mp3", ".wav", ".aiff", ".ogg" };
 
-    //    //This is a temporary property used to store the file paths froma parse Directory
-    //    public List<String> Files = new List<String> { };
-
-
-    //    public Dictionary<string, Playlist> Playlists;
-    //    public Dictionary<string, Album> Albums;
-
-    //    public bool isShuffle = false;
-    //    public bool isReplay = false;
-    //    public bool isReplayInfinite = false;
-
-    //    private Config _config;
-    //    public Config Config
-    //    {
-    //        get { return _config; }
-    //        set { _config = value; }
-    //    }
+        //This is a temporary property used to store the file paths froma parse Directory
+        public List<String> Files = new List<String> { };
 
 
-    //    private int _id;
-    //    public int ID
-    //    {
-    //        get { return ++_id; }
-    //        set { _id = value; }
-    //    }
+        public Dictionary<string, Playlist> Playlists;
+        public Dictionary<string, Album> Albums;
+
+        public bool isShuffle = false;
+        public bool isReplay = false;
+        public bool isReplayInfinite = false;
+
+        private Config _config;
+        public Config Config
+        {
+            get { return _config; }
+            set { _config = value; }
+        }
 
 
-    //    private string[] _folders = new string[] { };
-    //    public string[] Folders
-    //    {
-    //        get
-    //        {
-    //            return _folders;
-    //        }
-    //        set
-    //        {
-    //            _folders = value;
-    //            this.MessageQueue.Enqueue(value);
-    //        }
-    //    }
+        private int _id;
+        public int ID
+        {
+            get { return ++_id; }
+            set { _id = value; }
+        }
 
-    //    //DO NOT TOUCH!!! This section contains the properties for MainWindow required for BackgroundTask
-    //    public BlockingCollection<Song> Playback_MessageQueue = new BlockingCollection<Song>();
-    //    private CancellationTokenSource CancellationToken = new CancellationTokenSource();
-    //    public ConcurrentQueue<string[]> MessageQueue = new ConcurrentQueue<string[]>();
-    //    public ConcurrentDictionary<string, Song> MediaLibrary;
-    //    public ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
-    //    public bool FileThreadRunning = true;
-    //    private Task PlaybackTask;
-    //    private Task FileTask;
-    //    #endregion
 
-    //    #region Threads
-    //    public MainWindow()
-    //    {
-    //        //Here Every bin File gets deserialized (file beolvasas) 
-    //        //In the first try block we look if the file exists 
-    //        //in the second try block we handle the file empty exceptio
-    //        //we do this for every .bin file (Config, MusicLibrary, Playlists, Albums, Folders)
+        private string[] _folders = new string[] { };
+        public string[] Folders
+        {
+            get
+            {
+                return _folders;
+            }
+            set
+            {
+                _folders = value;
+                this.MessageQueue.Enqueue(value);
+            }
+        }
 
-    //        try
-    //        {
-    //            using (Stream stream = System.IO.File.Open("./Config.bin", FileMode.Open))
-    //            {
-    //                try
-    //                {
-    //                    this.Config = (Config)formatter.Deserialize(stream);
-    //                }
-    //                catch (System.Runtime.Serialization.SerializationException)
-    //                {
+        //DO NOT TOUCH!!! This section contains the properties for MainWindow required for BackgroundTask
+        public BlockingCollection<Song> Playback_MessageQueue = new BlockingCollection<Song>();
+        private CancellationTokenSource CancellationToken = new CancellationTokenSource();
+        public ConcurrentQueue<string[]> MessageQueue = new ConcurrentQueue<string[]>();
+        public ConcurrentDictionary<string, Song> MediaLibrary;
+        public ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
+        public bool FileThreadRunning = true;
+        private Task PlaybackTask;
+        private Task FileTask;
+        #endregion
 
-    //                    this.Config = new Config();
-    //                }
+        #region Threads
+        public MainWindow()
+        {
+            //Here Every bin File gets deserialized (file beolvasas) 
+            //In the first try block we look if the file exists 
+            //in the second try block we handle the file empty exceptio
+            //we do this for every .bin file (Config, MusicLibrary, Playlists, Albums, Folders)
 
-    //            }
-    //        }
-    //        catch (System.IO.FileNotFoundException)
-    //        {
-    //            using (FileStream fileStream = System.IO.File.Create("./Config.bin")) { }
-    //            this.Config = new Config();
-    //        }
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Config.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Config = (Config)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
 
-    //        try
-    //        {
-    //            using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Open))
-    //            {
-    //                try
-    //                {
-    //                    this.Folders = (string[])formatter.Deserialize(stream);
-    //                }
-    //                catch (System.Runtime.Serialization.SerializationException)
-    //                {
-    //                    this.Folders = new string[] { };
-    //                }
-    //            }
-    //        }
-    //        catch (System.IO.FileNotFoundException)
-    //        {
+                        this.Config = new Config();
+                    }
 
-    //            using (FileStream fileStream = System.IO.File.Create("./Folders.bin")) { }
-    //            this.Folders = new string[] { };
-    //        }
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Config.bin")) { }
+                this.Config = new Config();
+            }
 
-    //        try
-    //        {
-    //            using (Stream stream = System.IO.File.Open("./MediaLibrary.bin", FileMode.Open))
-    //            {
-    //                try
-    //                {
-    //                    this.MediaLibrary = (ConcurrentDictionary<string, Song>)formatter.Deserialize(stream);
-    //                }
-    //                catch (System.Runtime.Serialization.SerializationException)
-    //                {
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Folders = (string[])formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+                        this.Folders = new string[] { };
+                    }
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
 
-    //                    this.MediaLibrary = new ConcurrentDictionary<string, Song>();
-    //                }
+                using (FileStream fileStream = System.IO.File.Create("./Folders.bin")) { }
+                this.Folders = new string[] { };
+            }
 
-    //            }
-    //        }
-    //        catch (System.IO.FileNotFoundException)
-    //        {
-    //            using (FileStream fileStream = System.IO.File.Create("./MediaLibrary.bin")) { }
-    //            this.MediaLibrary = new ConcurrentDictionary<string, Song>();
-    //        }
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./MediaLibrary.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.MediaLibrary = (ConcurrentDictionary<string, Song>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
 
-    //        try
-    //        {
-    //            using (Stream stream = System.IO.File.Open("./Albums.bin", FileMode.Open))
-    //            {
-    //                try
-    //                {
-    //                    this.Albums = (Dictionary<string, Album>)formatter.Deserialize(stream);
-    //                }
-    //                catch (System.Runtime.Serialization.SerializationException)
-    //                {
+                        this.MediaLibrary = new ConcurrentDictionary<string, Song>();
+                    }
 
-    //                    this.Albums = new Dictionary<string, Album>();
-    //                }
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./MediaLibrary.bin")) { }
+                this.MediaLibrary = new ConcurrentDictionary<string, Song>();
+            }
 
-    //            }
-    //        }
-    //        catch (System.IO.FileNotFoundException)
-    //        {
-    //            using (FileStream fileStream = System.IO.File.Create("./Albums.bin")) { }
-    //            this.Albums = new Dictionary<string, Album>();
-    //        }
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Albums.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Albums = (Dictionary<string, Album>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
 
-    //        try
-    //        {
-    //            using (Stream stream = System.IO.File.Open("./Playlists.bin", FileMode.Open))
-    //            {
-    //                try
-    //                {
-    //                    this.Playlists = (Dictionary<string, Playlist>)formatter.Deserialize(stream);
-    //                }
-    //                catch (System.Runtime.Serialization.SerializationException)
-    //                {
+                        this.Albums = new Dictionary<string, Album>();
+                    }
 
-    //                    this.Playlists = new Dictionary<string, Playlist>();
-    //                }
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Albums.bin")) { }
+                this.Albums = new Dictionary<string, Album>();
+            }
 
-    //            }
-    //        }
-    //        catch (System.IO.FileNotFoundException)
-    //        {
-    //            using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
-    //            this.Playlists = new Dictionary<string, Playlist>();
-    //        }
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Playlists.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Playlists = (Dictionary<string, Playlist>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
 
-    //        this.outputDevice.PlaybackStopped += OnPlaybackStopped;
-    //        this.PlaybackTask = Task.Run(() => MediaTask());
-    //        this.FileTask = Task.Run(() => BackgroundTask());
-    //        InitializeComponent();
-    //        Closing += WindowEventClose;
-    //    }
+                        this.Playlists = new Dictionary<string, Playlist>();
+                    }
 
-    //    private void MediaTask()
-    //    {
-    //        while (!this.CancellationToken.Token.IsCancellationRequested)
-    //        {
-    //            try
-    //            {
-    //                Song song = this.Playback_MessageQueue.Take(this.CancellationToken.Token);
-    //                this.outputDevice.Init(new AudioFileReader(song.Path));
-    //                outputDevice.Play();
-    //            }
-    //            catch (OperationCanceledException)
-    //            {
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
+                this.Playlists = new Dictionary<string, Playlist>();
+            }
 
-    //            }
-    //        }
-    //    }
+            this.outputDevice.PlaybackStopped += OnPlaybackStopped;
+            this.PlaybackTask = Task.Run(() => MediaTask());
+            this.FileTask = Task.Run(() => BackgroundTask());
+            InitializeComponent();
+            Closing += WindowEventClose;
+        }
 
-    //    private void BackgroundTask()
-    //    {
+        private void MediaTask()
+        {
+            while (!this.CancellationToken.Token.IsCancellationRequested)
+            {
+                try
+                {
+                    Song song = this.Playback_MessageQueue.Take(this.CancellationToken.Token);
+                    this.outputDevice.Init(new AudioFileReader(song.Path));
+                    outputDevice.Play();
+                }
+                catch (OperationCanceledException)
+                {
 
-    //        //This section gets called only once and parses all the folders for any changes
-    //        foreach (var folder in this.Folders)
-    //        {
-    //            this.ParseFolder(folder);
-    //            this.DirectoryEventSub(folder);
-    //        }
-    //        this.ParseFiles();
-    //        this.Files = new List<String> { };
+                }
+            }
+        }
 
-    //        this.SongList = this.MediaLibrary.OrderBy(e => e.Value.ID).ToList();
+        private void BackgroundTask()
+        {
 
-    //        if (this.SongList.Count != 0)
-    //        {
-    //            this.SongInFocus = this.SongList[SongIndex];
-    //        }
+            //This section gets called only once and parses all the folders for any changes
+            foreach (var folder in this.Folders)
+            {
+                this.ParseFolder(folder);
+                this.DirectoryEventSub(folder);
+            }
+            this.ParseFiles();
+            this.Files = new List<String> { };
 
-    //        while (!this.CancellationToken.Token.IsCancellationRequested)
-    //        {
+            this.SongList = this.MediaLibrary.OrderBy(e => e.Value.ID).ToList();
 
-    //            //this section gets called every 5 seconds and checks for new folders, if there are any it parses them
-    //            string[] value;
-    //            if (MessageQueue.TryDequeue(out value))
-    //            {
-    //                foreach (var folder in value)
-    //                {
-    //                    this.ParseFolder(folder);
-    //                    this.DirectoryEventSub(folder);
-    //                }
-    //                this.ParseFiles();
-    //                if (this.SongIndex == null)
-    //                {
-    //                    this.SongInFocus = this.SongList[SongIndex];
-    //                }
+            if (this.SongList.Count != 0)
+            {
+                this.SongInFocus = this.SongList[SongIndex];
+            }
 
-    //                this.Files = new List<String> { };
+            while (!this.CancellationToken.Token.IsCancellationRequested)
+            {
 
-    //            }
+                //this section gets called every 5 seconds and checks for new folders, if there are any it parses them
+                string[] value;
+                if (MessageQueue.TryDequeue(out value))
+                {
+                    foreach (var folder in value)
+                    {
+                        this.ParseFolder(folder);
+                        this.DirectoryEventSub(folder);
+                    }
+                    this.ParseFiles();
+                    if (this.SongIndex == null)
+                    {
+                        this.SongInFocus = this.SongList[SongIndex];
+                    }
 
-    //            Thread.Sleep(5000);
-    //        }
-    //    }
+                    this.Files = new List<String> { };
 
-    //    #endregion
+                }
 
-    //    #region Filesystem Interactions
+                Thread.Sleep(5000);
+            }
+        }
 
-    //    private void ParseFiles()
-    //    {
-    //        foreach (var file in this.Files)
-    //        {
-    //            string name = file.Split(@"\").Last();
-    //            this.MediaLibrary.TryAdd(name, new Song(file, ID));
-    //            this.SongList.Add(new KeyValuePair<string, Song>(name, new Song(file, ID)));
-    //            if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
-    //            {
-    //                AddSongToAlbum(name);
-    //            }
-    //            else
-    //            {
-    //                AddAlbum(this.MediaLibrary[name].Album);
-    //            }
-    //        }
-    //    }
-    //    private void ParseFolder(string path)
-    //    {
-    //        this.Files.AddRange(Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
-    //                .Where(item => SupportedFormats.Contains(Path.GetExtension(item).ToLower()))
-    //                .Select(item => Path.GetFullPath(item))
-    //                .ToList());
-    //    }
-    //    private void LoadSong(string path) { }
-    //    #endregion
+        #endregion
 
-    //    #region Gui Event Handlers
-    //    private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
-    //    {
-    //        Closing -= WindowEventClose;
-    //        outputDevice.Stop();
-    //        outputDevice.Dispose();
-    //        Playback_MessageQueue.CompleteAdding();
-    //        CancellationToken.Cancel();
-    //        PlaybackTask.Wait();
-    //        FileTask.Wait();
-    //    }
-    //    private void bt_AddFolder(object sender, RoutedEventArgs e)
-    //    {
-    //        var dlg = new CommonOpenFileDialog();
-    //        dlg.IsFolderPicker = true;
-    //        dlg.Multiselect = true;
-    //        dlg.ShowPlacesList = true;
+        #region Filesystem Interactions
 
-    //        if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
-    //        {
-    //            string[] selectedFolders = dlg.FileNames.ToArray();
+        private void ParseFiles()
+        {
+            foreach (var file in this.Files)
+            {
+                string name = file.Split(@"\").Last();
+                this.MediaLibrary.TryAdd(name, new Song(file, ID));
+                this.SongList.Add(new KeyValuePair<string, Song>(name, new Song(file, ID)));
+                if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
+                {
+                    AddSongToAlbum(name);
+                }
+                else
+                {
+                    AddAlbum(this.MediaLibrary[name].Album);
+                }
+            }
+        }
+        private void ParseFolder(string path)
+        {
+            this.Files.AddRange(Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
+                    .Where(item => SupportedFormats.Contains(Path.GetExtension(item).ToLower()))
+                    .Select(item => Path.GetFullPath(item))
+                    .ToList());
+        }
+        private void LoadSong(string path) { }
+        #endregion
 
-    //            foreach (var item in selectedFolders)
-    //            {
-    //                if (this.Folders.Contains(item))
-    //                {
-    //                    MessageBox.Show("You have already added this folder", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-    //                    return;
-    //                }
-    //            }
+        #region Gui Event Handlers
+        private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Closing -= WindowEventClose;
+            outputDevice.Stop();
+            outputDevice.Dispose();
+            Playback_MessageQueue.CompleteAdding();
+            CancellationToken.Cancel();
+            PlaybackTask.Wait();
+            FileTask.Wait();
+        }
+        private void bt_AddFolder(object sender, RoutedEventArgs e)
+        {
+            var dlg = new CommonOpenFileDialog();
+            dlg.IsFolderPicker = true;
+            dlg.Multiselect = true;
+            dlg.ShowPlacesList = true;
 
-    //            this.Folders = Folders.Concat(selectedFolders).ToArray();
+            if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                string[] selectedFolders = dlg.FileNames.ToArray();
 
-    //            using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Create))
-    //            {
-    //                formatter.Serialize(stream, this.Folders);
-    //            }
-    //        }
-    //    }
-    //    private void bt_listdirectories(object sender, routedeventargs e)
-    //    {
-    //        directories.text = "";
+                foreach (var item in selectedFolders)
+                {
+                    if (this.Folders.Contains(item))
+                    {
+                        MessageBox.Show("You have already added this folder", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                }
 
-    //        foreach (var entry in this.medialibrary)
-    //        {
-    //            directories.text += $"\n\nkey: {entry.key}\nname: {entry.value.title}\ntrack: {entry.value.track}\nyear: {entry.value.year}\ngenre: {entry.value.genre}\nalbum: {entry.value.album}\nartist: {entry.value.artist}\ndisc: {entry.value.disc}\nduration: {entry.value.duration}\npath: {entry.value.path}\n";
-    //        }
+                this.Folders = Folders.Concat(selectedFolders).ToArray();
 
-    //        //Directories.Text += $"\n\nKey: {this.SongInFocus.Key}\nName: {this.SongInFocus.Value.Title}\nTrack: {this.SongInFocus.Value.Track}\nYear: {this.SongInFocus.Value.Year}\nGenre: {this.SongInFocus.Value.Genre}\nAlbum: {this.SongInFocus.Value.Album}\nArtist: {this.SongInFocus.Value.Artist}\nDisc: {this.SongInFocus.Value.Disc}\nDuration: {this.SongInFocus.Value.Duration}\nPath: {this.SongInFocus.Value.Path}\n";
+                using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Create))
+                {
+                    formatter.Serialize(stream, this.Folders);
+                }
+            }
+        }
+        //private void bt_listdirectories(object sender, RoutedEventArgs e)
+        //{
+        //    directories.text = "";
 
-    //    }
-    //    private void bt_Play(object sender, RoutedEventArgs e) { PlaySong(); }
-    //    private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
-    //    private void bt_Stop(object sender, RoutedEventArgs e) { StopSong(); }
-    //    private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
-    //    #endregion
+        //    foreach (var entry in this.medialibrary)
+        //    {
+        //        directories.text += $"\n\nkey: {entry.key}\nname: {entry.value.title}\ntrack: {entry.value.track}\nyear: {entry.value.year}\ngenre: {entry.value.genre}\nalbum: {entry.value.album}\nartist: {entry.value.artist}\ndisc: {entry.value.disc}\nduration: {entry.value.duration}\npath: {entry.value.path}\n";
+        //    }
 
-    //    #region Event Handlers
-    //    private void DirectoryEventSub(string path)
-    //    {
-    //        FileSystemWatcher watcher = new FileSystemWatcher(path);
+        //    //Directories.Text += $"\n\nKey: {this.SongInFocus.Key}\nName: {this.SongInFocus.Value.Title}\nTrack: {this.SongInFocus.Value.Track}\nYear: {this.SongInFocus.Value.Year}\nGenre: {this.SongInFocus.Value.Genre}\nAlbum: {this.SongInFocus.Value.Album}\nArtist: {this.SongInFocus.Value.Artist}\nDisc: {this.SongInFocus.Value.Disc}\nDuration: {this.SongInFocus.Value.Duration}\nPath: {this.SongInFocus.Value.Path}\n";
 
-    //        watcher.EnableRaisingEvents = true;
+        //}
+        private void bt_Play(object sender, RoutedEventArgs e) { PlaySong(); }
+        private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
+        private void bt_Stop(object sender, RoutedEventArgs e) { StopSong(); }
+        private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
+        #endregion
 
-    //        watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+        #region Event Handlers
+        private void DirectoryEventSub(string path)
+        {
+            FileSystemWatcher watcher = new FileSystemWatcher(path);
 
-    //        watcher.Created += DirectoryEventCreated;
-    //        watcher.Deleted += DirectoryEventDeleted;
-    //        watcher.Changed += DirectoryEventChanged;
+            watcher.EnableRaisingEvents = true;
 
-    //        this.Watchers.TryAdd(path, watcher);
-    //    }
-    //    private void DirectoryEventCreated(object source, FileSystemEventArgs e)
-    //    {
-    //        MediaLibrary.TryAdd(e.Name, new Song(e.FullPath, ID));
-    //    }
-    //    private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
-    //    {
-    //        MediaLibrary.TryRemove(e.Name, out _);
-    //    }
-    //    private void DirectoryEventChanged(object source, FileSystemEventArgs e)
-    //    {
-    //        //This is unhandled as of yet, since im not shure how this event works and stuff
-    //    }
-    //    public void OnPlaybackStopped(object sender, StoppedEventArgs e)
-    //    {
-    //    }
-    //    #endregion
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 
-    //    #region Album Actions
-    //    private void RemoveAlbum(string key)
-    //    {
-    //        this.Albums.Remove(key);
-    //    }
-    //    private void AddAlbum(string key)
-    //    {
-    //        this.Albums.Add(key, new Album(ID));
-    //    }
-    //    private void AddSongToAlbum(string key)
-    //    {
-    //        this.Albums[this.MediaLibrary[key].Album].SongIdList.Add(key);
-    //    }
-    //    private void RemoveSongFromAlbum(string AlbumKey, string SongKey)
-    //    {
-    //        this.Albums[AlbumKey].SongIdList.Remove(SongKey);
-    //    }
-    //    #endregion
+            watcher.Created += DirectoryEventCreated;
+            watcher.Deleted += DirectoryEventDeleted;
+            watcher.Changed += DirectoryEventChanged;
 
-    //    #region Playlist Actions
-    //    private void RemovePlaylist(string key)
-    //    {
-    //        this.Playlists.Remove(key);
-    //    }
-    //    private void AddPlaylist(string key)
-    //    {
-    //        this.Albums.Add(key, new Album(ID));
-    //    }
-    //    private void AddSongToPlaylist(string key)
-    //    {
-    //        this.Albums[this.MediaLibrary[key].Album].SongIdList.Add(key);
-    //    }
-    //    private void RemoveSongFromPlaylist(string PlaylistKey, string SongKey)
-    //    {
-    //        this.Albums[PlaylistKey].SongIdList.Remove(SongKey);
-    //    }
-    //    #endregion
+            this.Watchers.TryAdd(path, watcher);
+        }
+        private void DirectoryEventCreated(object source, FileSystemEventArgs e)
+        {
+            MediaLibrary.TryAdd(e.Name, new Song(e.FullPath, ID));
+        }
+        private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
+        {
+            MediaLibrary.TryRemove(e.Name, out _);
+        }
+        private void DirectoryEventChanged(object source, FileSystemEventArgs e)
+        {
+            //This is unhandled as of yet, since im not shure how this event works and stuff
+        }
+        public void OnPlaybackStopped(object sender, StoppedEventArgs e)
+        {
+        }
+        #endregion
 
-    //    #region Playback Actions
-    //    private void Replay() { }
-    //    private void Shuffle() { }
-    //    private void PreviousSong() { this.SongInFocus = this.SongList[--SongIndex]; }
-    //    private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
-    //    private void PlaySong()
-    //    {
-    //        Playback_MessageQueue.Add(this.SongInFocus.Value);
-    //    }
-    //    private void PauseSong() { }
-    //    private void StopSong() { this.outputDevice.Stop(); }
-    //    #endregion
+        #region Album Actions
+        private void RemoveAlbum(string key)
+        {
+            this.Albums.Remove(key);
+        }
+        private void AddAlbum(string key)
+        {
+            this.Albums.Add(key, new Album(ID));
+        }
+        private void AddSongToAlbum(string key)
+        {
+            this.Albums[this.MediaLibrary[key].Album].SongIdList.Add(key);
+        }
+        private void RemoveSongFromAlbum(string AlbumKey, string SongKey)
+        {
+            this.Albums[AlbumKey].SongIdList.Remove(SongKey);
+        }
+        #endregion
 
-    //}
+        #region Playlist Actions
+        private void RemovePlaylist(string key)
+        {
+            this.Playlists.Remove(key);
+        }
+        private void AddPlaylist(string key)
+        {
+            this.Albums.Add(key, new Album(ID));
+        }
+        private void AddSongToPlaylist(string key)
+        {
+            this.Albums[this.MediaLibrary[key].Album].SongIdList.Add(key);
+        }
+        private void RemoveSongFromPlaylist(string PlaylistKey, string SongKey)
+        {
+            this.Albums[PlaylistKey].SongIdList.Remove(SongKey);
+        }
+        #endregion
+
+        #region Playback Actions
+        private void Replay() { }
+        private void Shuffle() { }
+        private void PreviousSong() { this.SongInFocus = this.SongList[--SongIndex]; }
+        private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
+        private void PlaySong()
+        {
+            Playback_MessageQueue.Add(this.SongInFocus.Value);
+        }
+        private void PauseSong() { }
+        private void StopSong() { this.outputDevice.Stop(); }
+        #endregion
+
+        private void switchToLocalFiles(object sender, RoutedEventArgs e)
+        {
+            localfiles ablak = new localfiles();
+            Application.Current.MainWindow.Content = ablak.Content;
+        }
+        void rectangle_MouseLeftButtonDown(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
 }

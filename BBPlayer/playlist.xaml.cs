@@ -10,25 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace BBPlayer
 {
     /// <summary>
-    /// Interaction logic for localfiles.xaml
+    /// Interaction logic for playlist.xaml
     /// </summary>
-    public partial class localfiles : Window
+    public partial class playlist : Page
     {
-        public localfiles()
+        public playlist()
         {
             InitializeComponent();
         }
-
-        private void switchToMainMenu(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = new MainWindow();
-            Application.Current.MainWindow.Content = mainWindow.Content;
-        }
-    
     }
 }
