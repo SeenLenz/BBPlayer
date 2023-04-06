@@ -24,6 +24,13 @@
             <Button Content="Stop" Width="60px" Height="20px" Margin="5" Click="bt_Stop"></Button>
             <Button Content="Next" Width="60px" Height="20px" Margin="5" Click="bt_Next"></Button>
             <Button Content="ListDirs" Width="60px" Height="20px" Margin="5" Click="bt_ListDirectories"></Button>
+            <ComboBox Width="110" SelectionChanged="SortChanged">
+                <ComboBoxItem Content="Date Added"/>
+                <ComboBoxItem Content="Album"/>
+                <ComboBoxItem Content="Artist"/>
+                <ComboBoxItem Content="Title"/>
+                <ComboBoxItem Content="Duration"/>
+            </ComboBox>
         </StackPanel>
         <ScrollViewer>
             <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Stretch"/>

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace BBPlayer.Classes
 {
+    [Serializable]
     public class Song : ObservableCollection<Song> 
     {
         public TimeSpan Duration { get; set; }

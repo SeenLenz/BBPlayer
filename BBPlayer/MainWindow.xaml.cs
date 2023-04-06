@@ -19,12 +19,35 @@ using System.Xml.Linq;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace BBPlayer
 {
     public partial class MainWindow : Window , INotifyPropertyChanged
     {
         #region Properties
+
+        public enum SortTypes
+        {
+            DateAdded,
+            Duration,
+            Title,
+            Artist,
+            Album,
+        }
+
+        private SortTypes _CurrentSort;
+
+        public SortTypes CurrentSort
+        {
+            get { return _CurrentSort; }
+            set {
+                this.Config.CurrentSort = value;
+                _CurrentSort = value; 
+            }
+        }
+
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public int StartIndex = 0;
@@ -67,7 +90,10 @@ namespace BBPlayer
         private int _id;
         public int ID
         {
-            get { return ++_id; }
+            get {
+                this.Config.uid = _id;
+                return ++_id; 
+            }
             set { _id = value; }
         }
         
@@ -92,7 +118,7 @@ namespace BBPlayer
         public BlockingCollection<Song> Playback_MessageQueue = new BlockingCollection<Song>();
         private CancellationTokenSource CancellationToken = new CancellationTokenSource();
         public ConcurrentQueue<string[]> MessageQueue = new ConcurrentQueue<string[]>();
-        public ConcurrentDictionary<string, Song> MediaLibrary;
+        public Dictionary<string, Song> MediaLibrary;
         public ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
         public bool FileThreadRunning = true;
         private Task PlaybackTask;
@@ -111,27 +137,145 @@ namespace BBPlayer
         public MainWindow()
         {
 
-        
-            
 
-            if (File.Exists(ConfigPath))
+
+
+            //Here Every bin File gets deserialized (file beolvasas) 
+            //In the first try block we look if the file exists 
+            //in the second try block we handle the file empty exceptio
+            //we do this for every .bin file (Config, MusicLibrary, Playlists, Albums, Folders)
+
+            try
             {
-                string fileContent;
-                using (StreamReader streamReader = File.OpenText(ConfigPath))
+                using (Stream stream = System.IO.File.Open("./Config.bin", FileMode.Open))
                 {
-                    fileContent = streamReader.ReadToEnd();
+                    try
+                    {
+                        this.Config = (Config)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.Config = new Config();
+                        this.ID = this.Config.uid;
+                        this.CurrentSort = this.Config.CurrentSort;
+                    }
+
                 }
-                this.Config = JsonSerializer.Deserialize<Config>(fileContent);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Config.bin")) { }
+                this.Config = new Config();
             }
 
-            if (File.Exists(SongListPath))
+            try
             {
-                string fileContent;
-                using (StreamReader streamReader = File.OpenText(SongListPath))
+                using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Open))
                 {
-                    fileContent = streamReader.ReadToEnd();
+                    try
+                    {
+                        this.Folders = (string[])formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+                        this.Folders = new string[] { };
+                    }
                 }
-                this.SongList = JsonSerializer.Deserialize<ObservableCollection<Song>>(fileContent);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+
+                using (FileStream fileStream = System.IO.File.Create("./Folders.bin")) { }
+                this.Folders = new string[] { };
+            }
+
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./MediaLibrary.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.MediaLibrary = (Dictionary<string, Song>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.MediaLibrary = new Dictionary<string, Song>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./MediaLibrary.bin")) { }
+                this.MediaLibrary = new Dictionary<string, Song>();
+            }
+
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Albums.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Albums = (Dictionary<string, Album>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.Albums = new Dictionary<string, Album>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Albums.bin")) { }
+                this.Albums = new Dictionary<string, Album>();
+            }
+
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./Playlists.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.Playlists = (Dictionary<string, Playlist>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.Playlists = new Dictionary<string, Playlist>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./Playlists.bin")) { }
+                this.Playlists = new Dictionary<string, Playlist>();
+            }
+
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./SongList.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.SongList = (ObservableCollection<Song>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.SongList = new ObservableCollection<Song>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./SongList.bin")) { }
+                this.Playlists = new Dictionary<string, Playlist>();
             }
 
 
@@ -163,27 +307,13 @@ namespace BBPlayer
 
         private void BackgroundTask()
         {
-
-            //This section gets called only once and parses all the folders for any changes
-
-            if (this.Folders.Length != 0)
+            if (this.SongList != null)
             {
-                foreach (var folder in this.Folders)
-                {
-                    this.ParseFolder(folder);
-                    this.DirectoryEventSub(folder);
-                }
-                this.ParseFiles();
-                this.Files = new List<String> { };
-
-                this.SongList.OrderBy(e => e.ID).ToList();
-
                 this.SongInFocus = this.SongList[SongIndex];
             }
-   
+            //This section gets called only once and parses all the folders for any changes
             while (!this.CancellationToken.Token.IsCancellationRequested)
             {
-
                 //this section gets called every 5 seconds and checks for new folders, if there are any it parses them
                 string[] value;
                 if (MessageQueue.TryDequeue(out value))
@@ -220,10 +350,78 @@ namespace BBPlayer
                 {
                     this.MediaLibrary.TryAdd(name, new Song(file, ID));
                     Song temp = new Song(file, ID);
-                    Application.Current.Dispatcher.Invoke(() =>
+
+                   
+
+                    switch (CurrentSort)
                     {
-                        this.SongList.Add(temp);
-                    });
+                        case SortTypes.DateAdded:
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                this.SongList.Add(temp);
+                            });
+                            break;
+
+                        case SortTypes.Duration:
+                            for (int i = 1; i < SongList.Count; i++)
+                            {
+                                if (SongList[i - 1].Duration > temp.Duration && temp.Duration >= SongList[i].Duration)
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        this.SongList.Insert(i, temp);
+                                    });
+                                }
+                                i++;
+                            }
+                            break;
+
+                        case SortTypes.Title:
+                            for (int i = 1; i < SongList.Count; i++)
+                            {
+                                if (SongList[i - 1].Title[0] > temp.Title[0] && temp.Title[0] >= SongList[i].Title[0])
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        this.SongList.Insert(i, temp);
+                                    });
+                                }
+                                i++;
+                            }
+                            break;
+
+                        case SortTypes.Artist:
+                            for (int i = 1; i < SongList.Count; i++)
+                            {
+                                if (SongList[i - 1].Artist[0] > temp.Artist[0] && temp.Artist[0] >= SongList[i].Artist[0])
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        this.SongList.Insert(i, temp);
+                                    });
+                                }
+                                i++;
+                            }
+                            break;
+
+                        case SortTypes.Album:
+                            for (int i = 1; i < SongList.Count; i++)
+                            {
+                                if (SongList[i - 1].Album[0] > temp.Album[0] && temp.Album[0] >= SongList[i].Album[0])
+                                {
+                                    Application.Current.Dispatcher.Invoke(() =>
+                                    {
+                                        this.SongList.Insert(i, temp);
+                                    });
+                                }
+                                i++;
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                   
 
                     if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
                     {
@@ -248,24 +446,79 @@ namespace BBPlayer
 
         #region Gui Event Handlers
 
-  
+        private void SortChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+
+            ComboBoxItem selectedItem = comboBox.SelectedItem as ComboBoxItem;
+            string selectedContent = selectedItem.Content as string;
+
+            TestLabel.Content = selectedContent;
+            switch (selectedContent)
+            {
+                case "Album":
+                    this.SongList.OrderBy(x => x.Album);
+                    this.CurrentSort = SortTypes.Album;
+                    break;
+                case "Date Added":
+                    this.SongList.OrderBy(x => x.ID);
+                    this.CurrentSort = SortTypes.DateAdded;
+                    break;
+                case "Artist":
+                    this.SongList.OrderBy(x => x.Artist);
+                    this.CurrentSort = SortTypes.Artist;
+                    break;
+                case "Title":
+                    this.SongList.OrderBy(x => x.Title);
+                    this.CurrentSort = SortTypes.Title;
+                    break;
+                case "Duration":
+                    this.SongList.OrderBy(x => x.Duration);
+                    this.CurrentSort = SortTypes.Duration;
+                    break;
+                default:
+                    break;
+            }
+        }
 
         private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
-            string SongListJson = JsonSerializer.Serialize(SongList);
-            using (StreamWriter streamWriter = File.CreateText(SongListPath))
-            {
-                streamWriter.Write(SongListJson);
-            }
-
-            Closing -= WindowEventClose;
+            CancellationToken.Cancel();
             outputDevice.Stop();
             outputDevice.Dispose();
             Playback_MessageQueue.CompleteAdding();
-            CancellationToken.Cancel();
-            PlaybackTask.Wait();
-            FileTask.Wait();
+
+            using (Stream stream = System.IO.File.Open("./MediaLibrary.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.MediaLibrary);
+            }
+
+            using (Stream stream = System.IO.File.Open("./SongList.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.SongList);
+            }
+
+            using (Stream stream = System.IO.File.Open("./Albums.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.Albums);
+            }
+
+            using (Stream stream = System.IO.File.Open("./Playlists.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.Playlists);
+            }
+
+            using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.Folders);
+            }
+
+            using (Stream stream = System.IO.File.Open("./Config.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.Config);
+            }
+
         }
         private void bt_AddFolder(object sender, RoutedEventArgs e)
         {
@@ -334,7 +587,7 @@ namespace BBPlayer
         }
         private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
         {
-            MediaLibrary.TryRemove(e.Name, out _);
+            MediaLibrary.Remove(e.Name, out _);
         }
         private void DirectoryEventChanged(object source, FileSystemEventArgs e)
         {
@@ -396,5 +649,6 @@ namespace BBPlayer
         private void StopSong() { this.outputDevice.Stop(); }
         #endregion
 
+       
     }
 }

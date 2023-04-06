@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,11 +22,13 @@ namespace BBPlayer.Classes
             Orange,
         }
 
+   
         public Themes currentTheme { get; set; }
         public bool isDebug { get; set; }
         public bool isExperimental { get; set; }
 
         public int uid { get; set; }
+        public BBPlayer.MainWindow.SortTypes CurrentSort;
 
         public Config()
         {
@@ -33,6 +36,7 @@ namespace BBPlayer.Classes
             this.isDebug = false;
             this.isExperimental = false;
             this.uid = 0;
+            this.CurrentSort = BBPlayer.MainWindow.SortTypes.DateAdded;
         }
     }
 }
