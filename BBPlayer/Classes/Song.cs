@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace BBPlayer.Classes
 {
     [Serializable]
-    public class Song : ObservableCollection<Song> 
+    public class Song : ObservableCollection<Song>
     {
         public TimeSpan Duration { get; set; }
         public string Title { get; set; }
@@ -22,7 +22,7 @@ namespace BBPlayer.Classes
         public string Disc { get; set; }
         public int ID { get; set; }
         public string FileName { get; set; }
-
+        public int Clicks { get; set; }
         public Song(string Path, int ID)
         {
             TagLib.File Raw = TagLib.File.Create(Path);
@@ -38,6 +38,7 @@ namespace BBPlayer.Classes
                 this.Genre = Raw.Tag.FirstGenre ?? "Unknown Genre";
                 this.Track = Convert.ToString(Raw.Tag.Track);
                 this.Disc = Convert.ToString(Raw.Tag.Disc);
+                this.Clicks = 0;
                 this.ID = ID;
             }
         }

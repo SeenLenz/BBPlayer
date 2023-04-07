@@ -20,10 +20,12 @@ using System.ComponentModel;
 using System.Text.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Windows.Data;
+using System.Reflection;
 
 namespace BBPlayer
 {
-    public partial class MainWindow : Window , INotifyPropertyChanged
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         #region Properties
 
@@ -41,9 +43,10 @@ namespace BBPlayer
         public SortTypes CurrentSort
         {
             get { return _CurrentSort; }
-            set {
+            set
+            {
                 this.Config.CurrentSort = value;
-                _CurrentSort = value; 
+                _CurrentSort = value;
             }
         }
 
@@ -90,13 +93,14 @@ namespace BBPlayer
         private int _id;
         public int ID
         {
-            get {
+            get
+            {
                 this.Config.uid = _id;
-                return ++_id; 
+                return ++_id;
             }
             set { _id = value; }
         }
-        
+
 
         private string[] _folders = new string[] { };
         public string[] Folders
@@ -130,6 +134,8 @@ namespace BBPlayer
         string MediaLibraryPath = @"./MediaLibrary.json";
         string AlbumsPath = @"./Albums.Json";
         string PlaylistsPath = @"./Playlists.json";
+
+        ICollectionView view;
 
         #endregion
 
@@ -281,6 +287,7 @@ namespace BBPlayer
 
             InitializeComponent();
             SongPanel.ItemsSource = SongList;
+            this.view = CollectionViewSource.GetDefaultView(SongPanel.ItemsSource);
             SongPanel.SelectionMode = SelectionMode.Single;
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
@@ -307,7 +314,7 @@ namespace BBPlayer
 
         private void BackgroundTask()
         {
-            if (this.SongList != null)
+            if (this.SongList != null && this.SongList.Count != 0)
             {
                 this.SongInFocus = this.SongList[SongIndex];
             }
@@ -351,78 +358,6 @@ namespace BBPlayer
                     this.MediaLibrary.TryAdd(name, new Song(file, ID));
                     Song temp = new Song(file, ID);
 
-                   
-
-                    switch (CurrentSort)
-                    {
-                        case SortTypes.DateAdded:
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                this.SongList.Add(temp);
-                            });
-                            break;
-
-                        case SortTypes.Duration:
-                            for (int i = 1; i < SongList.Count; i++)
-                            {
-                                if (SongList[i - 1].Duration > temp.Duration && temp.Duration >= SongList[i].Duration)
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        this.SongList.Insert(i, temp);
-                                    });
-                                }
-                                i++;
-                            }
-                            break;
-
-                        case SortTypes.Title:
-                            for (int i = 1; i < SongList.Count; i++)
-                            {
-                                if (SongList[i - 1].Title[0] > temp.Title[0] && temp.Title[0] >= SongList[i].Title[0])
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        this.SongList.Insert(i, temp);
-                                    });
-                                }
-                                i++;
-                            }
-                            break;
-
-                        case SortTypes.Artist:
-                            for (int i = 1; i < SongList.Count; i++)
-                            {
-                                if (SongList[i - 1].Artist[0] > temp.Artist[0] && temp.Artist[0] >= SongList[i].Artist[0])
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        this.SongList.Insert(i, temp);
-                                    });
-                                }
-                                i++;
-                            }
-                            break;
-
-                        case SortTypes.Album:
-                            for (int i = 1; i < SongList.Count; i++)
-                            {
-                                if (SongList[i - 1].Album[0] > temp.Album[0] && temp.Album[0] >= SongList[i].Album[0])
-                                {
-                                    Application.Current.Dispatcher.Invoke(() =>
-                                    {
-                                        this.SongList.Insert(i, temp);
-                                    });
-                                }
-                                i++;
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
-                   
-
                     if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
                     {
                         AddSongToAlbum(name);
@@ -445,6 +380,11 @@ namespace BBPlayer
         #endregion
 
         #region Gui Event Handlers
+    
+        private void SongFocusChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])];
+        }
 
         private void SortChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -454,27 +394,32 @@ namespace BBPlayer
             string selectedContent = selectedItem.Content as string;
 
             TestLabel.Content = selectedContent;
+            view.SortDescriptions.Clear();
             switch (selectedContent)
             {
                 case "Album":
-                    this.SongList.OrderBy(x => x.Album);
-                    this.CurrentSort = SortTypes.Album;
+                    this.view.SortDescriptions.Add(new SortDescription("Album", ListSortDirection.Descending));
+                    view.Refresh();
                     break;
                 case "Date Added":
-                    this.SongList.OrderBy(x => x.ID);
-                    this.CurrentSort = SortTypes.DateAdded;
+                    this.view.SortDescriptions.Add(new SortDescription("ID", ListSortDirection.Descending));
+                    view.Refresh();
                     break;
                 case "Artist":
-                    this.SongList.OrderBy(x => x.Artist);
-                    this.CurrentSort = SortTypes.Artist;
+                    this.view.SortDescriptions.Add(new SortDescription("Artist", ListSortDirection.Descending));
+                    view.Refresh();
                     break;
                 case "Title":
-                    this.SongList.OrderBy(x => x.Title);
-                    this.CurrentSort = SortTypes.Title;
+                    this.view.SortDescriptions.Add(new SortDescription("Title", ListSortDirection.Descending));
+                    view.Refresh();
                     break;
                 case "Duration":
-                    this.SongList.OrderBy(x => x.Duration);
-                    this.CurrentSort = SortTypes.Duration;
+                    this.view.SortDescriptions.Add(new SortDescription("Duration", ListSortDirection.Descending));
+                    view.Refresh();
+                    break;
+                case "Most Played":
+                    this.view.SortDescriptions.Add(new SortDescription("Clicks", ListSortDirection.Descending));
+                    view.Refresh();
                     break;
                 default:
                     break;
@@ -639,8 +584,10 @@ namespace BBPlayer
         #region Playback Actions
         private void Replay() { }
         private void Shuffle() { }
-        private void PreviousSong() { this.SongInFocus = this.SongList[--SongIndex]; }
-        private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
+
+        private void PreviousSong() { this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[--SongPanel.SelectedIndex])]; }
+        private void NextSong() { this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])]; }
+
         private void PlaySong()
         {
             Playback_MessageQueue.Add(this.SongInFocus);
@@ -649,6 +596,6 @@ namespace BBPlayer
         private void StopSong() { this.outputDevice.Stop(); }
         #endregion
 
-       
+
     }
 }

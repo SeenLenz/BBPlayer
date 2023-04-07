@@ -30,16 +30,17 @@
                 <ComboBoxItem Content="Artist"/>
                 <ComboBoxItem Content="Title"/>
                 <ComboBoxItem Content="Duration"/>
+                <ComboBoxItem Content="Most Played"/>
             </ComboBox>
         </StackPanel>
         <ScrollViewer>
             <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Stretch"/>
         </ScrollViewer>
         <Button Content="Add File" Width="60px" Height="20px" Click="bt_AddFolder" ></Button>
-        <ListView Name="SongPanel" Grid.Column="1" VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple">
+        <ListView Name="SongPanel" Grid.Column="1" SelectionChanged="SongFocusChanged" VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemTemplate>
                 <DataTemplate DataType="local:Song">
-                    <Grid Height="55" HorizontalAlignment="Stretch">
+                    <Grid Height="55" HorizontalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=SongPanel}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="1*" />
