@@ -436,7 +436,6 @@ namespace BBPlayer
         private void PauseSong() { }
         private void StopSong() { this.outputDevice.Stop(); }
         #endregion
-
         private void switchToLocalFiles(object sender, RoutedEventArgs e)
         {
             localfiles ablak = new localfiles();
@@ -444,7 +443,8 @@ namespace BBPlayer
         }
         void rectangle_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-
+            Playlist playlistpage = new();
+            Application.Current.MainWindow.Content = playlistpage.Content;
         }
     }
 }

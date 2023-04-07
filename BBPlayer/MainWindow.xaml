@@ -196,14 +196,20 @@
                 <Label Style="{StaticResource MusicTitle}" VerticalAlignment="Center"/>
                 <Slider Style="{StaticResource TimeSlider}" Grid.Column="0" Margin="0,0,0,2" Grid.Row="1"/>
             </Grid>
-            <Rectangle Margin="24,69,0,0" Style="{StaticResource albumRectangle}" MouseDown="rectangle_MouseLeftButtonDown"/>
-            <Rectangle Margin="174,69,0,0" Style="{StaticResource albumRectangle}"/>
-            <Rectangle Margin="324,69,0,0" Style="{StaticResource albumRectangle}"/>
-            <Rectangle Margin="474,69,0,0" Style="{StaticResource albumRectangle}"/>
-            <Rectangle Margin="40,88,0,0"  Style="{StaticResource albumCoverRectangle}" />
-            <Rectangle Margin="190,88,0,0" Style="{StaticResource albumCoverRectangle}" />
-            <Rectangle Margin="340,85,0,0" Style="{StaticResource albumCoverRectangle}" />
-            <Rectangle Margin="490,88,0,0" Style="{StaticResource albumCoverRectangle}" />
+            <ScrollViewer Grid.Column="1" >
+                <StackPanel  HorizontalAlignment="Left" Orientation="Horizontal">
+                    <Grid Height="auto" >
+                        <Rectangle  Margin="24,69,0,0" Style="{StaticResource albumRectangle}" MouseDown="rectangle_MouseLeftButtonDown"/>
+                        <Rectangle  Margin="40,88,0,0" Style="{StaticResource albumCoverRectangle}"/>
+
+                    </Grid>
+                    <Grid Height="auto">
+                        <Rectangle Margin="24,69,0,0" Style="{StaticResource albumRectangle}" MouseDown="rectangle_MouseLeftButtonDown"/>
+                        <Rectangle Margin="40,88,0,0" Style="{StaticResource albumCoverRectangle}"/>
+                       
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
 
 
         </Grid>
