@@ -10,19 +10,62 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using TagLib;
+using System.Windows.Controls;
+using System.Data;
+using WForms = System.Windows.Forms;
+using System.Windows.Forms.Integration;
+using System.Windows.Controls.Primitives;
+using System.Xml.Linq;
+using System.ComponentModel;
+using System.Text.Json;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows.Data;
+using System.Reflection;
 
 namespace BBPlayer
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         #region Properties
+
+        public enum SortTypes
+        {
+            DateAdded,
+            Duration,
+            Title,
+            Artist,
+            Album,
+        }
+
+        private SortTypes _CurrentSort;
+
+        public SortTypes CurrentSort
+        {
+            get { return _CurrentSort; }
+            set
+            {
+                this.Config.CurrentSort = value;
+                _CurrentSort = value;
+            }
+        }
+
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public int StartIndex = 0;
+        public int PageSize = 30;
+        public int CurrentCount = 0;
+        public int TotalCount = 0;
+        public double ScrollDifference = 0;
 
         private WaveOutEvent outputDevice = new WaveOutEvent();
         private AudioFileReader audioFile;
 
-        private KeyValuePair<string, Song> SongInFocus;
-        private List<KeyValuePair<string, Song>> SongList = new List<KeyValuePair<string, Song>> { };
+        private Song SongInFocus;
+        private ObservableCollection<Song> SongList = new ObservableCollection<Song> { };
+
+
         private int SongIndex = 0;
 
         public BinaryFormatter formatter = new BinaryFormatter();
@@ -50,7 +93,11 @@ namespace BBPlayer
         private int _id;
         public int ID
         {
-            get { return ++_id; }
+            get
+            {
+                this.Config.uid = _id;
+                return ++_id;
+            }
             set { _id = value; }
         }
 
@@ -69,20 +116,36 @@ namespace BBPlayer
             }
         }
 
+        private WForms.ListView SongListView = new WForms.ListView();
+
         //DO NOT TOUCH!!! This section contains the properties for MainWindow required for BackgroundTask
         public BlockingCollection<Song> Playback_MessageQueue = new BlockingCollection<Song>();
         private CancellationTokenSource CancellationToken = new CancellationTokenSource();
         public ConcurrentQueue<string[]> MessageQueue = new ConcurrentQueue<string[]>();
-        public ConcurrentDictionary<string, Song> MediaLibrary;
+        public Dictionary<string, Song> MediaLibrary;
         public ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
         public bool FileThreadRunning = true;
         private Task PlaybackTask;
         private Task FileTask;
+
+        string SongListPath = @"./SongList.json";
+        string ConfigPath = @"./Config.json";
+        string FoldersPath = @"./Folders.json";
+        string MediaLibraryPath = @"./MediaLibrary.json";
+        string AlbumsPath = @"./Albums.Json";
+        string PlaylistsPath = @"./Playlists.json";
+
+        ICollectionView view;
+
         #endregion
 
         #region Threads
         public MainWindow()
         {
+
+
+
+
             //Here Every bin File gets deserialized (file beolvasas) 
             //In the first try block we look if the file exists 
             //in the second try block we handle the file empty exceptio
@@ -100,6 +163,8 @@ namespace BBPlayer
                     {
 
                         this.Config = new Config();
+                        this.ID = this.Config.uid;
+                        this.CurrentSort = this.Config.CurrentSort;
                     }
 
                 }
@@ -137,12 +202,12 @@ namespace BBPlayer
                 {
                     try
                     {
-                        this.MediaLibrary = (ConcurrentDictionary<string, Song>)formatter.Deserialize(stream);
+                        this.MediaLibrary = (Dictionary<string, Song>)formatter.Deserialize(stream);
                     }
                     catch (System.Runtime.Serialization.SerializationException)
                     {
 
-                        this.MediaLibrary = new ConcurrentDictionary<string, Song>();
+                        this.MediaLibrary = new Dictionary<string, Song>();
                     }
 
                 }
@@ -150,7 +215,7 @@ namespace BBPlayer
             catch (System.IO.FileNotFoundException)
             {
                 using (FileStream fileStream = System.IO.File.Create("./MediaLibrary.bin")) { }
-                this.MediaLibrary = new ConcurrentDictionary<string, Song>();
+                this.MediaLibrary = new Dictionary<string, Song>();
             }
 
             try
@@ -197,10 +262,36 @@ namespace BBPlayer
                 this.Playlists = new Dictionary<string, Playlist>();
             }
 
+            try
+            {
+                using (Stream stream = System.IO.File.Open("./SongList.bin", FileMode.Open))
+                {
+                    try
+                    {
+                        this.SongList = (ObservableCollection<Song>)formatter.Deserialize(stream);
+                    }
+                    catch (System.Runtime.Serialization.SerializationException)
+                    {
+
+                        this.SongList = new ObservableCollection<Song>();
+                    }
+
+                }
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                using (FileStream fileStream = System.IO.File.Create("./SongList.bin")) { }
+                this.Playlists = new Dictionary<string, Playlist>();
+            }
+
+
+            InitializeComponent();
+            SongPanel.ItemsSource = SongList;
+            this.view = CollectionViewSource.GetDefaultView(SongPanel.ItemsSource);
+            SongPanel.SelectionMode = SelectionMode.Single;
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
             this.FileTask = Task.Run(() => BackgroundTask());
-            InitializeComponent();
             Closing += WindowEventClose;
         }
 
@@ -223,26 +314,13 @@ namespace BBPlayer
 
         private void BackgroundTask()
         {
-
-            //This section gets called only once and parses all the folders for any changes
-            foreach (var folder in this.Folders)
-            {
-                this.ParseFolder(folder);
-                this.DirectoryEventSub(folder);
-            }
-            this.ParseFiles();
-            this.Files = new List<String> { };
-
-            this.SongList = this.MediaLibrary.OrderBy(e => e.Value.ID).ToList();
-
-            if (this.SongList.Count != 0)
+            if (this.SongList != null && this.SongList.Count != 0)
             {
                 this.SongInFocus = this.SongList[SongIndex];
             }
-
+            //This section gets called only once and parses all the folders for any changes
             while (!this.CancellationToken.Token.IsCancellationRequested)
             {
-
                 //this section gets called every 5 seconds and checks for new folders, if there are any it parses them
                 string[] value;
                 if (MessageQueue.TryDequeue(out value))
@@ -275,15 +353,19 @@ namespace BBPlayer
             foreach (var file in this.Files)
             {
                 string name = file.Split(@"\").Last();
-                this.MediaLibrary.TryAdd(name, new Song(file, ID));
-                this.SongList.Add(new KeyValuePair<string, Song>(name, new Song(file, ID)));
-                if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
+                if (!this.MediaLibrary.ContainsKey(name))
                 {
-                    AddSongToAlbum(name);
-                }
-                else
-                {
-                    AddAlbum(this.MediaLibrary[name].Album);
+                    this.MediaLibrary.TryAdd(name, new Song(file, ID));
+                    Song temp = new Song(file, ID);
+
+                    if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
+                    {
+                        AddSongToAlbum(name);
+                    }
+                    else
+                    {
+                        AddAlbum(this.MediaLibrary[name].Album);
+                    }
                 }
             }
         }
@@ -298,15 +380,90 @@ namespace BBPlayer
         #endregion
 
         #region Gui Event Handlers
+    
+        private void SongFocusChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])];
+        }
+
+        private void SortChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+
+            ComboBoxItem selectedItem = comboBox.SelectedItem as ComboBoxItem;
+            string selectedContent = selectedItem.Content as string;
+
+            TestLabel.Content = selectedContent;
+            view.SortDescriptions.Clear();
+            switch (selectedContent)
+            {
+                case "Album":
+                    this.view.SortDescriptions.Add(new SortDescription("Album", ListSortDirection.Descending));
+                    view.Refresh();
+                    break;
+                case "Date Added":
+                    this.view.SortDescriptions.Add(new SortDescription("ID", ListSortDirection.Descending));
+                    view.Refresh();
+                    break;
+                case "Artist":
+                    this.view.SortDescriptions.Add(new SortDescription("Artist", ListSortDirection.Descending));
+                    view.Refresh();
+                    break;
+                case "Title":
+                    this.view.SortDescriptions.Add(new SortDescription("Title", ListSortDirection.Descending));
+                    view.Refresh();
+                    break;
+                case "Duration":
+                    this.view.SortDescriptions.Add(new SortDescription("Duration", ListSortDirection.Descending));
+                    view.Refresh();
+                    break;
+                case "Most Played":
+                    this.view.SortDescriptions.Add(new SortDescription("Clicks", ListSortDirection.Descending));
+                    view.Refresh();
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Closing -= WindowEventClose;
+
+            CancellationToken.Cancel();
             outputDevice.Stop();
             outputDevice.Dispose();
             Playback_MessageQueue.CompleteAdding();
-            CancellationToken.Cancel();
-            PlaybackTask.Wait();
-            FileTask.Wait();
+
+            using (Stream stream = System.IO.File.Open("./MediaLibrary.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.MediaLibrary);
+            }
+
+            using (Stream stream = System.IO.File.Open("./SongList.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.SongList);
+            }
+
+            using (Stream stream = System.IO.File.Open("./Albums.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.Albums);
+            }
+
+            using (Stream stream = System.IO.File.Open("./Playlists.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.Playlists);
+            }
+
+            using (Stream stream = System.IO.File.Open("./Folders.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.Folders);
+            }
+
+            using (Stream stream = System.IO.File.Open("./Config.bin", FileMode.Create))
+            {
+                this.formatter.Serialize(stream, this.Config);
+            }
+
         }
         private void bt_AddFolder(object sender, RoutedEventArgs e)
         {
@@ -375,7 +532,7 @@ namespace BBPlayer
         }
         private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
         {
-            MediaLibrary.TryRemove(e.Name, out _);
+            MediaLibrary.Remove(e.Name, out _);
         }
         private void DirectoryEventChanged(object source, FileSystemEventArgs e)
         {
@@ -427,15 +584,18 @@ namespace BBPlayer
         #region Playback Actions
         private void Replay() { }
         private void Shuffle() { }
-        private void PreviousSong() { this.SongInFocus = this.SongList[--SongIndex]; }
-        private void NextSong() { this.SongInFocus = this.SongList[++SongIndex]; }
+
+        private void PreviousSong() { this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[--SongPanel.SelectedIndex])]; }
+        private void NextSong() { this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])]; }
+
         private void PlaySong()
         {
-            Playback_MessageQueue.Add(this.SongInFocus.Value);
+            Playback_MessageQueue.Add(this.SongInFocus);
         }
         private void PauseSong() { }
         private void StopSong() { this.outputDevice.Stop(); }
         #endregion
+
 
     }
 }

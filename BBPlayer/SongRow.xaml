@@ -4,20 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:BBPlayer"
-             mc:Ignorable="d" d:DesignWidth="1200" Height="35">
-    <Grid Background="#FFFFFFFF">
+             mc:Ignorable="d" d:DesignWidth="960" Height="35">
+    <Grid >
         <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="5*"></ColumnDefinition>
+            <ColumnDefinition Width="4*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="4*"></ColumnDefinition>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label Name="lb_SongName" HorizontalAlignment="Center" VerticalAlignment="Center">lb_SongName</Label>
-        <StackPanel  Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Button Name="bt_PlaySong" Width="30" Height="30" Margin="10px 0px 0px 0px">></Button>
-            <Button Name="bt_SongOptions" Width="30" Height="30" Margin="10px 0px 0px 0px">...</Button>
-        </StackPanel>
-        <Label Name="lb_SongLenght" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{Binding SongLenght}"></Label>
-        <Label Name="lb_DateAdded" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">lb_DateAdded</Label>
+        <Label Grid.Column="0" Content="{Binding SongTitle}" Name="lb_SongTitle" Margin="30,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
+        <Label Grid.Column="1" Content="{Binding SongArtist}" Name="lb_SongArtist" Margin="30,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
+        <Label Grid.Column="2" Content="{Binding SongYear}" Name="lb_SongYear" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+        <Label Grid.Column="3" Content="{Binding SongGenre}" Name="lb_SongGenre" Margin="30,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
+        <Label Grid.Column="4" Content="{Binding SongDuration}" Name="lb_SongDuration" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
     </Grid>
 </UserControl>
