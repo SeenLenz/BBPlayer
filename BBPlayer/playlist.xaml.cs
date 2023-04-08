@@ -34,5 +34,18 @@ namespace BBPlayer
             MainWindow mainWindow = new MainWindow();
             Application.Current.MainWindow.Content = mainWindow.Content;
         }
+        int clickcounter = 1;
+        private void bt_PlaySong_Click(object sender, RoutedEventArgs e)
+        {
+            clickcounter++;
+            if (clickcounter % 2 == 0)
+            {
+                bt_PlaySong.Content = "||";
+            }
+            else
+            {
+                bt_PlaySong.Content = ">";
+            }
+        }
     }
 }
