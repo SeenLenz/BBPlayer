@@ -229,14 +229,30 @@
                             <Image Source="/Sanyi.png" Height="100px">
 
                             </Image>
+                            <Label x:Name="albumName" HorizontalAlignment="Left" Foreground="#6E6E6E" FontSize="24" Grid.Column="1">
+                                asdsadsa
+                            </Label>
+                            <TextBlock x:Name="albumDesc" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#6E6E6E" FontSize="15" Grid.ColumnSpan="2" Margin="178,0,0,0">
+                                asdsadadwa
+                            </TextBlock>
                         </Grid>
-                        <userControls:SongRow Grid.Row="1"/>
-                        <userControls:SongRow Grid.Row="1"/>
-                        <userControls:SongRow Grid.Row="1"/>
-                        <userControls:SongRow Grid.Row="1"/>
-                        <userControls:SongRow Grid.Row="1"/>
-                        <userControls:SongRow Grid.Row="1"/>
-                        <userControls:SongRow Grid.Row="1"/>
+                        <StackPanel Grid.Row="1">
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                            <userControls:SongRow Grid.Row="1"/>
+                        </StackPanel>
                     </Grid>
 
                 </StackPanel>

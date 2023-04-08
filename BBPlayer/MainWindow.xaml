@@ -211,13 +211,13 @@
             <ScrollViewer Grid.Column="1" >
                 <WrapPanel Orientation="Horizontal" Width="630">
                     <Grid Height="auto" >
-                        <Rectangle  Margin="24,69,0,0" Style="{StaticResource albumRectangle}" MouseDown="rectangle_MouseLeftButtonDown"/>
+                        <Rectangle  Margin="24,69,0,0" Style="{StaticResource albumRectangle}" MouseDown="AddPlaylist"/>
                         <Rectangle  Margin="40,88,0,0" Style="{StaticResource albumCoverRectangle}"/>
 
                     </Grid>
                     <Grid Height="auto">
                         <Rectangle Margin="24,69,0,0" Style="{StaticResource albumRectangle}" MouseDown="rectangle_MouseLeftButtonDown"/>
-                        <Rectangle Margin="40,88,0,0" Style="{StaticResource albumCoverRectangle}"/>
+                        <Rectangle x:Name="albumCover" Margin="40,88,0,0" Style="{StaticResource albumCoverRectangle}"/>
 
                     </Grid>
                     <Grid Height="auto">

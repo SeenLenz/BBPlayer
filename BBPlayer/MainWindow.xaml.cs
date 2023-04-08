@@ -459,5 +459,9 @@ namespace BBPlayer
                 bt_PlaySong.Content = ">";
             }
         }
+        void AddPlaylist(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
