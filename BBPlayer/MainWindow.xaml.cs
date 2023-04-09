@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using TagLib;
 
 namespace BBPlayer
@@ -231,6 +232,11 @@ namespace BBPlayer
                     Song song = this.Playback_MessageQueue.Take(this.CancellationToken.Token);
                     this.outputDevice.Init(this.audioFile = new AudioFileReader(song.Path));
                     outputDevice.Play();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        outputDevice.Volume = Convert.ToSingle(volume.Value) / 100;
+                    });
+                    
                 }
                 catch (OperationCanceledException)
                 {
@@ -327,11 +333,14 @@ namespace BBPlayer
                         {
                             Application.Current.Dispatcher.Invoke(() =>
                             {
-
-                                status.Content = csere;
                                 Slider.Value = this.PlaybackState;
                             });
                         }
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            status.Content = csere;
+                        });
+                        
                         if (PlaybackState == jelenlegislidermax)
                         {
                             Replay_OnSongEnd();
@@ -442,9 +451,16 @@ namespace BBPlayer
         private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
         private void bt_Replay(object sender, RoutedEventArgs e){ Replay(); }
-        private void DragStarted(object sender, DragEventArgs e){ onDragStarted(); }
+        private void DragStarted(object sender, DragStartedEventArgs e) { onDragStarted(); }
         
         private void DragCompleted(object sender, RoutedEventArgs e) { Drag(); }
+        private void volume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e){ vol(e.NewValue); }
+
+        private void vol(double e)
+        {
+            float x = Convert.ToSingle(e) / 100;
+            outputDevice.Volume = x;
+        }
         #endregion
 
         #region Event Handlers
@@ -551,7 +567,16 @@ namespace BBPlayer
                 {
                     PauseSong();
                     this.SongInFocus = this.SongList[0];
+                    SongIndex = 0;
+                    this.outputDevice.Stop();
                     this.outputDevice.Dispose();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        status.Content = "0:00";
+                        this.státusz = 0;
+                        this.PlaybackState = 0;
+                        Slider.Value = 0;
+                    });
                     PlaySong();
                 }
                 else
@@ -563,12 +588,13 @@ namespace BBPlayer
 
                         Application.Current.Dispatcher.Invoke(() =>
                         {
+                            status.Content = "0:00";
                             this.státusz = 0;
                             this.PlaybackState = 0;
                             Slider.Value = 0;
                         });
                     }
-                        this.outputDevice.Stop();
+                    this.outputDevice.Stop();
                     this.outputDevice.Dispose();
                     PlaySong();
                 }
@@ -589,12 +615,25 @@ namespace BBPlayer
         }
         private void Shuffle() { }
         private void PreviousSong() {
-            if (SongIndex -1 != -1)
+            if (PlaybackState > 20) // lejátszás nem a szám első 20 mp-jében van
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    status.Content = "0:00";
+                    this.státusz = 0;
+                    this.PlaybackState = 0;
+                    Slider.Value = 0;
+                    this.outputDevice.Stop();
+                });
+                PlaySong();
+            }
+            else if (SongIndex -1 != -1)
             {
                 this.SongInFocus = this.SongList[--SongIndex];
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
+                    status.Content = "0:00";
                     this.státusz = 0;
                     this.PlaybackState = 0;
                     Slider.Value = 0;
@@ -603,6 +642,19 @@ namespace BBPlayer
                 });
                 PlaySong();
             }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    status.Content = "0:00";
+                    this.státusz = 0;
+                    this.PlaybackState = 0;
+                    Slider.Value = 0;
+                    this.outputDevice.Stop();
+                });
+                PlaySong();
+            }
+            
 
         }
         private void NextSong() {
@@ -612,6 +664,7 @@ namespace BBPlayer
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
+                    status.Content = "0:00";
                     this.státusz = 0;
                     this.PlaybackState = 0;
                     Slider.Value = 0;
@@ -642,6 +695,10 @@ namespace BBPlayer
 
                     this.outputDevice.Init(audioFile);
                     this.outputDevice.Play();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        outputDevice.Volume = Convert.ToSingle(volume.Value) / 100;
+                    });
                 }
                 else
                 {
@@ -719,7 +776,10 @@ namespace BBPlayer
             }
             status.Content = csere;
             this.outputDevice.Play();
-            
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                outputDevice.Volume = Convert.ToSingle(volume.Value) / 100;
+            });
         }
 
 
@@ -731,6 +791,7 @@ namespace BBPlayer
             long bytes = (long)(durationInSeconds * sampleRate * channels * bitsPerSample / 8);
             return bytes;
         }
+
 
         #endregion
 
