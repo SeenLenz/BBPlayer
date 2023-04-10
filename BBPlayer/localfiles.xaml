@@ -217,21 +217,26 @@
                 <Slider Style="{StaticResource TimeSlider}" Grid.Column="0" Margin="0,0,0,2" Grid.Row="1"/>
             </Grid>
             <ScrollViewer Grid.Column="1">
-                <StackPanel>
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                    <userControls:SongRow />
-                </StackPanel>
+                <ListView Name="SongPanel" Grid.Column="1" SelectionChanged="SongFocusChanged" VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListView.ItemTemplate>
+                        <DataTemplate DataType="local:Song">
+                            <Grid Height="55" HorizontalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=SongPanel}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Content="{Binding Title}" Name="lb_SongTitle" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
+                                <Label Grid.Column="1" Content="{Binding Artist}" Name="lb_SongArtist" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
+                                <Label Grid.Column="2" Content="{Binding Year}" Name="lb_SongYear" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+                                <Label Grid.Column="3" Content="{Binding Genre}" Name="lb_SongGenre" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
+                                <Label Grid.Column="4" Content="{Binding Duration}" Name="lb_SongDuration" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </ScrollViewer>
         </Grid>
     </Border>
