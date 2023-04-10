@@ -188,6 +188,9 @@
                     <Image Style="{StaticResource AlbumCover}" Source="/Sanyi.png"/>
                 </Border>
             </StackPanel>
+            <Button x:Name="closeWindow" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20" Margin="0,0,18,10" Panel.ZIndex="10" Click="closeWindow1">
+                X
+            </Button>
             <Grid Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition></RowDefinition>
@@ -197,6 +200,8 @@
                     <ColumnDefinition Width="8*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
+                <Slider Margin="10,0,0,0" Grid.Column="1" Grid.Row="1" Style="{StaticResource TimeSlider}"/>
+
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.3*"></ColumnDefinition>
@@ -205,6 +210,7 @@
                         <ColumnDefinition Width="0.5*"></ColumnDefinition>
                         <ColumnDefinition Width="1*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
+                    
                     <Label Style="{StaticResource MusicTitle}" VerticalAlignment="Center"/>
                     <Button Grid.Column="1" Name="bt_PrevSong" Width="30" Height="30" Margin="10px 0px 0px 0px" Content="|◀"></Button>
                     <Button Grid.Column="2" Name="bt_PlaySong" Width="30" Height="30" Margin="10px 0px 0px 0px" Click="bt_PlaySong_Click">></Button>

@@ -466,7 +466,7 @@ namespace BBPlayer
 
         private void closeWindow1(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Application.Current.Shutdown();
         }
     }
 }

@@ -176,6 +176,9 @@
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
+            <Button x:Name="closeWindow" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20" Margin="0,0,18,10" Panel.ZIndex="10" Click="closeWindow1">
+                X
+            </Button>
             <StackPanel Background="Black" Opacity="0.8" Grid.RowSpan="2">
                 <Button Style="{StaticResource Title}" Click="switchToMainMenu" />
                 <Button Style="{StaticResource MenuButton1}"/>
@@ -196,6 +199,8 @@
                     <ColumnDefinition Width="8*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
+                <Slider Margin="10,0,0,0" Grid.Column="1" Grid.Row="1" Style="{StaticResource TimeSlider}"/>
+
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.3*"></ColumnDefinition>

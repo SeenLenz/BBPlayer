@@ -47,5 +47,9 @@ namespace BBPlayer
                 bt_PlaySong.Content = ">";
             }
         }
+        private void closeWindow1(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }

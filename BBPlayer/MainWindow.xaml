@@ -196,6 +196,7 @@
                     <ColumnDefinition Width="8*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
+                <Slider Margin="10,0,0,0" Grid.Column="1" Grid.Row="1" Style="{StaticResource TimeSlider}"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.3*"></ColumnDefinition>
