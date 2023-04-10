@@ -22,6 +22,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Reflection;
+using Microsoft.VisualBasic.ApplicationServices;
 
 namespace BBPlayer
 {
@@ -287,14 +288,18 @@ namespace BBPlayer
 
             InitializeComponent();
             SongPanel.ItemsSource = SongList;
+            
             this.view = CollectionViewSource.GetDefaultView(SongPanel.ItemsSource);
             SongPanel.SelectionMode = SelectionMode.Single;
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = Task.Run(() => MediaTask());
             this.FileTask = Task.Run(() => BackgroundTask());
             Closing += WindowEventClose;
-        }
 
+            CollectionView sortview = (CollectionView)CollectionViewSource.GetDefaultView(SongPanel.ItemsSource); ;
+            sortview.Filter = SongFilter;
+        }
+        
         private void MediaTask()
         {
             while (!this.CancellationToken.Token.IsCancellationRequested)
@@ -380,7 +385,20 @@ namespace BBPlayer
         #endregion
 
         #region Gui Event Handlers
-    
+
+        private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(SongPanel.ItemsSource).Refresh();
+        }
+
+        private bool SongFilter(object item)
+        {
+            if (String.IsNullOrEmpty(txtSearch.Text))
+                return true;
+            else
+                return ((item as Song).Title.IndexOf(txtSearch.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
         private void SongFocusChanged(object sender, SelectionChangedEventArgs e)
         {
             this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])];

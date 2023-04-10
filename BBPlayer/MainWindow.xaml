@@ -32,6 +32,7 @@
                 <ComboBoxItem Content="Duration"/>
                 <ComboBoxItem Content="Most Played"/>
             </ComboBox>
+            <TextBox Name="txtSearch" TextChanged="txtSearch_TextChanged" Width="140"  />
         </StackPanel>
         <ScrollViewer>
             <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Stretch"/>
