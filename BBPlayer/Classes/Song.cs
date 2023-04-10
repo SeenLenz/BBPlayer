@@ -25,21 +25,28 @@ namespace BBPlayer.Classes
         public int Clicks { get; set; }
         public Song(string Path, int ID)
         {
-            TagLib.File Raw = TagLib.File.Create(Path);
-            if (Raw.Tag != null)
+            try
             {
-                this.Path = Path;
-                this.Duration = Raw.Properties.Duration;
-                this.Title = Raw.Tag.Title ?? Path.Split(@"\").Last().Split(".").First();
-                this.FileName = Path.Split(@"\").Last();
-                this.Artist = Raw.Tag.FirstPerformer ?? "Unknown Artis";
-                this.Album = Raw.Tag.Album ?? "Unknown Album";
-                this.Year = Convert.ToString(Raw.Tag.Year);
-                this.Genre = Raw.Tag.FirstGenre ?? "Unknown Genre";
-                this.Track = Convert.ToString(Raw.Tag.Track);
-                this.Disc = Convert.ToString(Raw.Tag.Disc);
-                this.Clicks = 0;
-                this.ID = ID;
+                TagLib.File Raw = TagLib.File.Create(Path);
+                if (Raw.Tag != null)
+                {
+                    this.Path = Path;
+                    this.Duration = Raw.Properties.Duration;
+                    this.Title = Raw.Tag.Title ?? Path.Split(@"\").Last().Split(".").First();
+                    this.FileName = Path.Split(@"\").Last();
+                    this.Artist = Raw.Tag.FirstPerformer ?? "Unknown Artis";
+                    this.Album = Raw.Tag.Album ?? "Unknown Album";
+                    this.Year = Convert.ToString(Raw.Tag.Year);
+                    this.Genre = Raw.Tag.FirstGenre ?? "Unknown Genre";
+                    this.Track = Convert.ToString(Raw.Tag.Track);
+                    this.Disc = Convert.ToString(Raw.Tag.Disc);
+                    this.Clicks = 0;
+                    this.ID = ID;
+                }
+            }
+            catch (System.IO.IOException)
+            {
+                throw;
             }
         }
     }
