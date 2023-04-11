@@ -24,5 +24,10 @@ namespace BBPlayer
         {
             InitializeComponent();
         }
+        void rectangle_MouseLeftButtonDown(object sender, RoutedEventArgs e)
+        {
+            Playlist playlistpage = new();
+            Application.Current.MainWindow.Content = playlistpage.Content;
+        }
     }
 }

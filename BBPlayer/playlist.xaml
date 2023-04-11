@@ -9,155 +9,7 @@
 
         Title="" Height="450" Width="800" WindowStyle="None">
     <Window.Resources>
-
-        <Style x:Key="Title" TargetType="Button">
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="FontWeight" Value="ExtraBold" />
-            <Setter Property="Background" Value="#00000000"/>
-            <Setter Property="Height" Value="50px"/>
-            <Setter Property="FontFamily" Value="Comic sans MS"/>
-            <Setter Property="Foreground" Value="#6E6E6E"/>
-            <Setter Property="Content" Value="BBPlayer :)"/>
-            <Setter Property="BorderThickness" Value="0px"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="10px,0px , 0px ,10px"/>
-            <Setter Property="Padding" Value="0,0,0,0"/>
-
-        </Style>
-        <Style x:Key="MenuButton1" TargetType="Button">
-            <Setter Property="Content" Value="Local Files"/>
-            <Setter Property="FontFamily" Value="Comic Sans MS"/>
-            <Setter Property="Background" Value="#00000000"/>
-            <Setter Property="BorderBrush" Value="Black"/>
-            <Setter Property="Foreground" Value="#6E6E6E"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
-        </Style>
-        <Style x:Key="MenuButton2" TargetType="Button">
-            <Setter Property="Content" Value="Playlists"/>
-            <Setter Property="FontFamily" Value="Comic Sans MS"/>
-            <Setter Property="Background" Value="#00000000"/>
-            <Setter Property="BorderBrush" Value="Black"/>
-            <Setter Property="Foreground" Value="#6E6E6E"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
-        </Style>
-        <Style x:Key="MenuButton3" TargetType="Button">
-            <Setter Property="Content" Value="Favourites"/>
-            <Setter Property="FontFamily" Value="Comic Sans MS"/>
-            <Setter Property="Background" Value="#00000000"/>
-            <Setter Property="BorderBrush" Value="Black"/>
-            <Setter Property="Foreground" Value="#6E6E6E"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
-        </Style>
-        <Style x:Key="AlbumCover" TargetType="Image">
-            <Setter Property="Source" Value="img/Sanyi.png"/>
-            <Setter Property="Grid.Row" Value="2"/>
-            <Setter Property="Height" Value="88px"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Grid.Row" Value="2"/>
-            <Setter Property="Margin" Value="0px, 0px, 0px, 0px"/>
-
-        </Style>
-        <Style x:Key="MusicTitle" TargetType="Label" >
-            <Setter Property="Content" Value="AKC MISI - A szeretet él"/>
-            <Setter Property="Margin" Value="0, 10px , 0px , 20px"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="Height" Value="25px"/>
-            <Setter Property="Width" Value="200px"/>
-            <Setter Property="FontSize" Value="12px"/>
-            <Setter Property="FontFamily" Value="Comic Sans MS"/>
-            <Setter Property="Foreground" Value="#6E6E6E"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-
-        </Style>
-        <Style x:Key="SliderThumbStyle" TargetType="Thumb">
-            <Setter Property="SnapsToDevicePixels" Value="true"/>
-            <Setter Property="OverridesDefaultStyle" Value="false"/>
-            <Setter Property="Height" Value="18"/>
-            <Setter Property="Width" Value="18"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Ellipse  Stroke="Black"
-                          StrokeThickness="1"
-                          Name="Ellipse" 
-                          Fill="#6E6E6E" />
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Ellipse" Property="Fill" Value="#6E6E6E"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter TargetName="Ellipse" Property="Fill" Value="#6E6E6E"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="Slider" x:Key="TimeSlider">
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Slider">
-                        <Grid Margin="0,0,0,24">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition Height="auto" Name="row" />
-                                <RowDefinition Height="auto" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto" />
-                                <ColumnDefinition Width="*" Name="column" />
-                                <ColumnDefinition Width="auto" />
-                            </Grid.ColumnDefinitions>
-                            <Border Name="PART_Border"
-                           BorderBrush="Black" BorderThickness="1"
-                           Padding="2"
-                          Grid.Row="1" Grid.Column="1"
-                           Width="{TemplateBinding Width}"
-                           Height="{TemplateBinding Height}"
-                           Background="#6E6E6E"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Center" />
-                            <Track Name="PART_Track"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Center"
-                              Grid.Row="1" Grid.Column="1"
-                              Width="{TemplateBinding Width}"
-                              Height="{TemplateBinding Height}">
-                                <Track.Thumb>
-                                    <Thumb Style="{StaticResource SliderThumbStyle}" />
-                                </Track.Thumb>
-                            </Track>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="albumRectangle" TargetType="Rectangle">
-            <Setter Property="Stroke" Value="#6E6E6E"/>
-            <Setter Property="StrokeThickness" Value="3"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Width" Value="126"/>
-            <Setter Property="Height" Value="160"/>
-            <Setter Property="Grid.Column" Value="1"/>
-            <Setter Property="Fill" Value="#CC000000"/>
-        </Style>
-        <Style x:Key="albumCoverRectangle" TargetType="Rectangle">
-            <Setter Property="Stroke" Value="#6E6E6E"/>
-            <Setter Property="StrokeThickness" Value="3"/>
-            <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Width" Value="95"/>
-            <Setter Property="Height" Value="95"/>
-            <Setter Property="Grid.Column" Value="1"/>
-        </Style>
-
-
+        <ResourceDictionary Source="Styles.xaml" />
     </Window.Resources>
     <Border CornerRadius="20,20,20,20" Background="#FF151515">
         <Grid>
@@ -215,6 +67,7 @@
                     <Button Grid.Column="1" Name="bt_PrevSong" Width="30" Height="30" Margin="10px 0px 0px 0px" Content="|◀"></Button>
                     <Button Grid.Column="2" Name="bt_PlaySong" Width="30" Height="30" Margin="10px 0px 0px 0px" Click="bt_PlaySong_Click">></Button>
                     <Button Grid.Column="3" Name="bt_NextSong" Width="30" Height="30" Margin="10px 0px 0px 0px" Content="▶|"></Button>
+                    <Button Grid.Column="4" Name="bt_Shuffle" Width="30" Height="30" Margin="10px 0px 0px 0px" HorizontalAlignment="Left" Content="?"></Button>
                 </Grid>
                 <Slider Style="{StaticResource TimeSlider}" Grid.Column="0" Margin="0,0,0,2" Grid.Row="1"/>
             </Grid>
@@ -243,7 +96,7 @@
                             </TextBlock>
                         </Grid>
                         <StackPanel Grid.Row="1">
-                            <ListView Name="SongPanel" Grid.Column="1" SelectionChanged="SongFocusChanged" VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView Name="SongPanel" Grid.Column="1"  VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                                 <ListView.ItemTemplate>
                                     <DataTemplate DataType="local:Song">
                                         <Grid Height="55" HorizontalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=SongPanel}">
