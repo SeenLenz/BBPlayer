@@ -39,7 +39,7 @@
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="0" FlowDirection="LeftToRight">
                 <Border BorderBrush="#6E6E6E" BorderThickness="3" HorizontalAlignment="Left">
-                    <Image x:Name="" Style="{StaticResource AlbumCover}" Source="/Sanyi.png"/>
+                    <Image x:Name="CurrTrackImg" Style="{StaticResource AlbumCover}" Source="/Sanyi.png"/>
                 </Border>
             </StackPanel>
             <Grid Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
