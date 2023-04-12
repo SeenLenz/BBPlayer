@@ -22,6 +22,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows.Data;
 using System.Reflection;
+using Microsoft.VisualBasic.ApplicationServices;
+using Newtonsoft.Json.Linq;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 
 namespace BBPlayer
 {
@@ -125,8 +128,8 @@ namespace BBPlayer
         public Dictionary<string, Song> MediaLibrary;
         public ConcurrentDictionary<string, FileSystemWatcher> Watchers = new ConcurrentDictionary<string, FileSystemWatcher>();
         public bool FileThreadRunning = true;
-        private Task PlaybackTask;
-        private Task FileTask;
+        private System.Threading.Tasks.Task PlaybackTask;
+        private System.Threading.Tasks.Task FileTask;
 
         string SongListPath = @"./SongList.json";
         string ConfigPath = @"./Config.json";
@@ -142,9 +145,6 @@ namespace BBPlayer
         #region Threads
         public MainWindow()
         {
-
-
-
 
             //Here Every bin File gets deserialized (file beolvasas) 
             //In the first try block we look if the file exists 
@@ -284,17 +284,38 @@ namespace BBPlayer
                 this.Playlists = new Dictionary<string, Playlist>();
             }
 
+            List<Song> songsToRemove = new List<Song>();
+            foreach (var song in this.SongList)
+            {
+                if (!File.Exists(song.Path))
+                {
+                    this.MediaLibrary.Remove(song.Path.Split(@"\").Last());
+                    songsToRemove.Add(song);
+                }
+            }
+
+            foreach (var songToRemove in songsToRemove)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SongList.Remove(songToRemove);
+                });
+            }
 
             InitializeComponent();
             SongPanel.ItemsSource = SongList;
+            
             this.view = CollectionViewSource.GetDefaultView(SongPanel.ItemsSource);
             SongPanel.SelectionMode = SelectionMode.Single;
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
-            this.PlaybackTask = Task.Run(() => MediaTask());
-            this.FileTask = Task.Run(() => BackgroundTask());
+            this.PlaybackTask = System.Threading.Tasks.Task.Run(() => MediaTask());
+            this.FileTask = System.Threading.Tasks.Task.Run(() => BackgroundTask());
             Closing += WindowEventClose;
-        }
 
+            CollectionView sortview = (CollectionView)CollectionViewSource.GetDefaultView(SongPanel.ItemsSource); ;
+            sortview.Filter = SongFilter;
+        }
+        
         private void MediaTask()
         {
             while (!this.CancellationToken.Token.IsCancellationRequested)
@@ -307,13 +328,14 @@ namespace BBPlayer
                 }
                 catch (OperationCanceledException)
                 {
-
+                }catch(InvalidOperationException) { 
                 }
             }
         }
 
         private void BackgroundTask()
         {
+            
             if (this.SongList != null && this.SongList.Count != 0)
             {
                 this.SongInFocus = this.SongList[SongIndex];
@@ -327,6 +349,7 @@ namespace BBPlayer
                 {
                     foreach (var folder in value)
                     {
+
                         this.ParseFolder(folder);
                         this.DirectoryEventSub(folder);
                     }
@@ -344,6 +367,21 @@ namespace BBPlayer
             }
         }
 
+        private void DirectoryEventSub(string path)
+        {
+            FileSystemWatcher watcher = new FileSystemWatcher(path);
+
+            watcher.EnableRaisingEvents = true;
+
+            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+
+            watcher.Created += DirectoryEventCreated;
+            watcher.Deleted += DirectoryEventDeleted;
+            watcher.Renamed += DirectoryEventRenamed;
+
+            this.Watchers.TryAdd(path, watcher);
+        }
+
         #endregion
 
         #region Filesystem Interactions
@@ -357,6 +395,12 @@ namespace BBPlayer
                 {
                     this.MediaLibrary.TryAdd(name, new Song(file, ID));
                     Song temp = new Song(file, ID);
+
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        SongList.Add(temp);
+                    });
 
                     if (this.Albums.ContainsKey(this.MediaLibrary[name].Album))
                     {
@@ -377,13 +421,35 @@ namespace BBPlayer
                     .ToList());
         }
         private void LoadSong(string path) { }
+
         #endregion
 
         #region Gui Event Handlers
-    
+
+        private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(SongPanel.ItemsSource).Refresh();
+        }
+
+        private bool SongFilter(object item)
+        {
+            if (String.IsNullOrEmpty(txtSearch.Text))
+                return true;
+            else
+                return ((item as Song).Title.IndexOf(txtSearch.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
         private void SongFocusChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])];
+            try
+            {
+                this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])];
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                this.SongInFocus = this.SongList[0];
+            }
+           
         }
 
         private void SortChanged(object sender, SelectionChangedEventArgs e)
@@ -512,31 +578,47 @@ namespace BBPlayer
         #endregion
 
         #region Event Handlers
-        private void DirectoryEventSub(string path)
-        {
-            FileSystemWatcher watcher = new FileSystemWatcher(path);
-
-            watcher.EnableRaisingEvents = true;
-
-            watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-
-            watcher.Created += DirectoryEventCreated;
-            watcher.Deleted += DirectoryEventDeleted;
-            watcher.Changed += DirectoryEventChanged;
-
-            this.Watchers.TryAdd(path, watcher);
-        }
+      
         private void DirectoryEventCreated(object source, FileSystemEventArgs e)
         {
-            MediaLibrary.TryAdd(e.Name, new Song(e.FullPath, ID));
+            System.Threading.Thread.Sleep(1000);
+            Song temp = new Song(e.FullPath, ID);
+            if (!this.MediaLibrary.ContainsKey(e.Name)) {
+                this.MediaLibrary.TryAdd(e.Name, temp);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SongList.Add(temp);
+                });
+            }
         }
         private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
         {
-            MediaLibrary.Remove(e.Name, out _);
+            this.MediaLibrary.Remove(e.Name, out _);
+            Song songToRemove = SongList.FirstOrDefault(s => s.Path == e.FullPath);
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (songToRemove != null)
+                {
+                    SongList.Remove(songToRemove);
+                }
+            });
+
         }
-        private void DirectoryEventChanged(object source, FileSystemEventArgs e)
+        private void DirectoryEventRenamed(object source, RenamedEventArgs e)
         {
-            //This is unhandled as of yet, since im not shure how this event works and stuff
+
+            //var songToUpdate = SongList.FirstOrDefault(s => s.Path == e.OldFullPath);
+            //TagLib.File Raw = TagLib.File.Create(e.FullPath);
+            //if (songToUpdate != null)
+            //{
+            //    songToUpdate.Path = e.FullPath;
+            //    songToUpdate.FileName = e.FullPath.Split(@"\").Last(); ;
+            //    songToUpdate.Title = Raw.Tag.Title ?? e.FullPath.Split(@"\").Last().Split(".").First();
+
+            //    MediaLibrary[songToUpdate.FileName] = songToUpdate;
+            //    CollectionViewSource.GetDefaultView(SongList).Refresh();
+            //}
+
         }
         public void OnPlaybackStopped(object sender, StoppedEventArgs e)
         {
