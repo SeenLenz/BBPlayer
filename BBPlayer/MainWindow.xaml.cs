@@ -991,11 +991,16 @@ namespace BBPlayer
                     this.Playback_MessageQueue.Add(this.SongInFocus);
 
                     this.Pause = false;
-                    int sampleRate = audioFile.WaveFormat.SampleRate;
-                    int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
-                    int channels = audioFile.WaveFormat.Channels;
-                    this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
 
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        status.Content = "0:00";
+                        this.státusz = 0;
+                        this.PlaybackState = 0;
+                        Slider.Value = 0;
+                        this.outputDevice.Stop();
+                        this.outputDevice.Dispose();
+                    });
 
 
                     //this.outputDevice.Init(audioFile);
