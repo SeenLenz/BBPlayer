@@ -140,7 +140,7 @@ namespace BBPlayer
         public bool FileThreadRunning = true;
         private System.Threading.Tasks.Task PlaybackTask;
         private System.Threading.Tasks.Task FileTask;
-
+        private System.Threading.Tasks.Task PlaybackStateTask;
         string SongListPath = @"./SongList.json";
         string ConfigPath = @"./Config.json";
         string FoldersPath = @"./Folders.json";
@@ -411,7 +411,7 @@ namespace BBPlayer
                 {
                        
                     
-                    while (SongInFocus.Key != null && this.PlaybackState != (int)SongInFocus.Value.Duration.TotalSeconds && this.Pause == false)
+                    while (SongInFocus != null && this.PlaybackState != (int)SongInFocus.Duration.TotalSeconds && this.Pause == false)
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
@@ -420,9 +420,9 @@ namespace BBPlayer
                         });
                         
 
-                        if (jelenlegislidermax != (int)SongInFocus.Value.Duration.TotalSeconds)
+                        if (jelenlegislidermax != (int)SongInFocus.Duration.TotalSeconds)
                         {
-                            int slidernum = (int)SongInFocus.Value.Duration.TotalSeconds;
+                            int slidernum = (int)SongInFocus.Duration.TotalSeconds;
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 Slider.Maximum = slidernum;
@@ -827,7 +827,7 @@ namespace BBPlayer
             }
             else if(this.isReplay == true)
             {
-                if (this.SongInFocus.Value == this.SongList[SongList.Count-1].Value) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
+                if (this.SongInFocus == this.SongList[SongList.Count-1]) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
                 {
                     PauseSong();
                     this.SongInFocus = this.SongList[0];
@@ -966,12 +966,12 @@ namespace BBPlayer
         {
             if (this.PlaybackStateTask == null || this.PlaybackStateTask.Status != TaskStatus.Running)
             {
-            this.Playback_MessageQueue.Add(this.SongInFocus.Value);
-            this.PlaybackStateTask = Task.Run(() => PlayingStateSeconds());
+            this.Playback_MessageQueue.Add(this.SongInFocus);
+            this.PlaybackStateTask = System.Threading.Tasks.Task.Run(() => PlayingStateSeconds());
             }
             else
             {
-                if (SongInFocus.Value.FileName == savedfilename)
+                if (SongInFocus.FileName == savedfilename)
                 {
                     this.Pause = false;
                     int sampleRate = audioFile.WaveFormat.SampleRate;
@@ -988,7 +988,7 @@ namespace BBPlayer
                 }
                 else
                 {
-                    this.Playback_MessageQueue.Add(this.SongInFocus.Value);
+                    this.Playback_MessageQueue.Add(this.SongInFocus);
 
                     this.Pause = false;
                     int sampleRate = audioFile.WaveFormat.SampleRate;
@@ -1019,7 +1019,7 @@ namespace BBPlayer
                     this.státusz = time;
                     this.outputDevice.Stop();
                 });
-                savedfilename = this.SongInFocus.Value.FileName;
+                savedfilename = this.SongInFocus.FileName;
                 
             }
         }

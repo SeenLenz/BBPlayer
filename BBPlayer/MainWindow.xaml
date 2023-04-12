@@ -19,11 +19,15 @@
             </RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" >
-            <Button Content="Previous" Width="60px" Height="20px" Margin="5" Click="bt_Previous"></Button>
-            <Button Content="Play" Width="60px" Height="20px" Margin="5" Click="bt_Play"></Button>
-            <Button Content="Stop" Width="60px" Height="20px" Margin="5" Click="bt_Stop"></Button>
-            <Button Content="Next" Width="60px" Height="20px" Margin="5" Click="bt_Next"></Button>
-            <Button Content="ListDirs" Width="60px" Height="20px" Margin="5" Click="bt_ListDirectories"></Button>
+            <Button x:Name="replay" Content="Replay off" Width="57" Height="20px" Click="bt_Replay"/>
+            <Button Content="Previous" Width="56" Height="20px" Margin="5" Click="bt_Previous"/>
+            <Button x:Name="bt_play" Content="Play" Width="56" Height="20px" Margin="5" Click="bt_Play"/>
+            <Button Content="Next" Width="57" Height="20px" Margin="5" Click="bt_Next"/>
+            <Button x:Name="shuf" Content="Shuffle off" Width="57" Height="20px" Margin="5" Click="bt_shuffle"/>
+            <Button Content="ListDirs" Width="56" Height="20px" Margin="5" Click="bt_ListDirectories"/>
+            <Slider x:Name="Slider" Width="150" Height="18" Maximum="200" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted"/>
+            <Label x:Name="status" Content="0:00" />
+            <Slider x:Name="volume" Value="100" Width="100" Height="22" Minimum="0" Maximum="100" ValueChanged="volume_ValueChanged"/>
             <ComboBox Width="110" SelectionChanged="SortChanged">
                 <ComboBoxItem Content="Date Added"/>
                 <ComboBoxItem Content="Album"/>
@@ -33,16 +37,8 @@
                 <ComboBoxItem Content="Most Played"/>
             </ComboBox>
             <TextBox Name="txtSearch" TextChanged="txtSearch_TextChanged" Width="140"  />
-        <StackPanel Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Width="620" >
-            <Button x:Name="replay" Content="Replay off" Width="57" Height="20px" Click="bt_Replay"/>
-            <Button Content="Previous" Width="56" Height="20px" Margin="5" Click="bt_Previous"/>
-            <Button x:Name="bt_play" Content="Play" Width="56" Height="20px" Margin="5" Click="bt_Play"/>
-            <Button Content="Next" Width="57" Height="20px" Margin="5" Click="bt_Next"/>
-            <Button Content="ListDirs" Width="56" Height="20px" Margin="5" Click="bt_ListDirectories"/>
-            <Slider x:Name="Slider" Width="150" Height="18" Maximum="200" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted"/>
-            <Label x:Name="status" Content="0:00" />
-            <Slider x:Name="volume" Value="100" Width="100" Height="22" Minimum="0" Maximum="100" ValueChanged="volume_ValueChanged"/>
         </StackPanel>
+        
         <ScrollViewer>
             <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Stretch"/>
         </ScrollViewer>
