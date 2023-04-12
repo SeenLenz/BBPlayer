@@ -3,67 +3,89 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:uc="clr-namespace:BBPlayer"
-        xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"  
-        xmlns:local="clr-namespace:BBPlayer.Classes"
+        xmlns:userControls="clr-namespace:BBPlayer"
+        xmlns:ResourceDictionary="http://schemas.microsoft.com/winfx/2006/xaml"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowStyle="ThreeDBorderWindow">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"></ColumnDefinition>
-            <ColumnDefinition Width="8*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition  Height="20*"></RowDefinition>
-            <RowDefinition Height="3*">
-            </RowDefinition>
-        </Grid.RowDefinitions>
-        <StackPanel Grid.Column="1" Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" >
-            <Button x:Name="replay" Content="Replay off" Width="57" Height="20px" Click="bt_Replay"/>
-            <Button Content="Previous" Width="56" Height="20px" Margin="5" Click="bt_Previous"/>
-            <Button x:Name="bt_play" Content="Play" Width="56" Height="20px" Margin="5" Click="bt_Play"/>
-            <Button Content="Next" Width="57" Height="20px" Margin="5" Click="bt_Next"/>
-            <Button x:Name="shuf" Content="Shuffle off" Width="57" Height="20px" Margin="5" Click="bt_shuffle"/>
-            <Button Content="ListDirs" Width="56" Height="20px" Margin="5" Click="bt_ListDirectories"/>
-            <Slider x:Name="Slider" Width="150" Height="18" Maximum="200" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted"/>
-            <Label x:Name="status" Content="0:00" />
-            <Slider x:Name="volume" Value="100" Width="100" Height="22" Minimum="0" Maximum="100" ValueChanged="volume_ValueChanged"/>
-            <ComboBox Width="110" SelectionChanged="SortChanged">
-                <ComboBoxItem Content="Date Added"/>
-                <ComboBoxItem Content="Album"/>
-                <ComboBoxItem Content="Artist"/>
-                <ComboBoxItem Content="Title"/>
-                <ComboBoxItem Content="Duration"/>
-                <ComboBoxItem Content="Most Played"/>
-            </ComboBox>
-            <TextBox Name="txtSearch" TextChanged="txtSearch_TextChanged" Width="140"  />
-        </StackPanel>
-        
-        <ScrollViewer>
-            <TextBlock Name="Directories" Grid.Column="0" TextWrapping="Wrap" Text="." VerticalAlignment="Stretch"/>
-        </ScrollViewer>
-        <Button Content="Add File" Width="60px" Height="20px" Click="bt_AddFolder" ></Button>
-        <ListView Name="SongPanel" Grid.Column="1" SelectionChanged="SongFocusChanged" VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListView.ItemTemplate>
-                <DataTemplate DataType="local:Song">
-                    <Grid Height="55" HorizontalAlignment="Stretch" Width="{Binding ActualWidth, ElementName=SongPanel}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="1" Content="{Binding Title}" Name="lb_SongTitle" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
-                        <Label Grid.Column="2" Content="{Binding Artist}" Name="lb_SongArtist" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
-                        <Label Grid.Column="3" Content="{Binding Genre}" Name="lb_SongGenre" HorizontalAlignment="Left" VerticalAlignment="Center"></Label>
-                        <Label Grid.Column="4" Content="{Binding Duration}" Name="lb_SongDuration" HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
+        Height="450" Width="800" WindowStyle="None">
+    <Window.Resources>
+        <ResourceDictionary Source="Styles.xaml" />
+    </Window.Resources>
+    <Border CornerRadius="20,20,20,20" Background="#FF151515">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="8*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="8*"/>
+                <RowDefinition Height="2*"/>
+            </Grid.RowDefinitions>
+            <Rectangle x:Name="Background" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="0,-4,0,4">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="Purple" Offset="0.0"/>
+                        <GradientStop Color="Black" Offset="1"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <StackPanel x:Name="ControlBar" Background="Black" Opacity="0.8" Grid.RowSpan="2"  Height="auto" Width="auto">
+                <Button x:Name="btn_Title" Style="{StaticResource Title}"/>
+                <Button x:Name="btn_LocalFiles"  Style="{StaticResource MenuButton1}" Click="switchToLocalFiles"/>
+                <Button x:Name="btn_Playlists" Style="{StaticResource MenuButton2}"/>
+                <Button x:Name="btn_Favourites" Style="{StaticResource MenuButton3}"/>
+            </StackPanel>
+            <StackPanel x:Name="controlPanelAlul" Grid.Row="2" Grid.ColumnSpan="2" FlowDirection="LeftToRight" Height="auto" Width="auto">
+                <Border BorderBrush="#6E6E6E" BorderThickness="3" HorizontalAlignment="Left">
+                    <Image x:Name="CurrentTrackImg" Style="{StaticResource AlbumCover}" Source="/Sanyi.png" Height="82" Width="82"/>
+                </Border>
+            </StackPanel>
+            <Button x:Name="closeWindow" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20" Margin="0,0,18,10" Panel.ZIndex="10" Click="closeWindow1">
+                   X             
+            </Button>
+            <Grid Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="8*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <Slider x:Name="volumeBar" Margin="10,0,0,0" Grid.Column="1" Grid.Row="1" Style="{StaticResource TimeSlider}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.3*"></ColumnDefinition>
+                        <ColumnDefinition Width="0.5*"></ColumnDefinition>
+                        <ColumnDefinition Width="0.5*"></ColumnDefinition>
+                        <ColumnDefinition Width="0.5*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Style="{StaticResource MusicTitle}" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Name="bt_PrevSong" Width="30" Height="30" Margin="10px 0px 0px 0px">
+                    </Button>
+                    <Button Grid.Column="2" Name="bt_PlaySong" Width="30" Margin="10,0,0,0" Height="30" Click="bt_PlaySong_Click" >
+                        <Image Source="/play-icon.jpg" Stretch="Fill">
+                            
+                        </Image>
+                    </Button>
+                    <Button Grid.Column="3" Name="bt_NextSong" Width="30" Height="30" Margin="10px 0px 0px 0px" Content="▶|"></Button>
+                    <Button Grid.Column="4" Name="bt_Shuffle" Width="30" Height="30" Margin="10px 0px 0px 0px" HorizontalAlignment="Left">
+                     
+                    </Button>
+                </Grid>
+                <Slider x:Name="timeBar" Style="{StaticResource TimeSlider}" Grid.Column="0" Margin="0,0,0,2" Grid.Row="1"/>
+            </Grid>
+            <ScrollViewer Grid.Column="1" >
+                <WrapPanel Orientation="Horizontal" Width="630">
+                    <Grid Height="auto" >
+                        <Rectangle  Margin="24,69,0,0" Style="{StaticResource albumRectangle}" MouseDown="AddPlaylist"/>
+                        <Rectangle  Margin="40,88,0,0" Style="{StaticResource albumCoverRectangle}"/>
                     </Grid>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <ScrollViewer Grid.Column="0" Grid.Row="1">
-            <Label x:Name="TestLabel" ></Label>
-        </ScrollViewer>
-    </Grid>
+                    <userControls:PlaylistRectangle/>
+                </WrapPanel>
+            </ScrollViewer>
+
+
+        </Grid>
+    </Border>
 </Window>

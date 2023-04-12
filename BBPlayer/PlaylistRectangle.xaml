@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="BBPlayer.PlaylistRectangle"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="229" d:DesignWidth="140">
+    <Grid Height="auto" >
+        <Rectangle x:Name="albumBg" Margin="24,69,0,0" Stroke="#6E6E6E" StrokeThickness="3" VerticalAlignment="Top" HorizontalAlignment="Left" Width="126" Height="160" Fill="#CC000000" MouseDown="rectangle_MouseLeftButtonDown"/>
+        <TextBlock x:Name="albumName" Margin="36,184,10,0" Foreground="#6E6E6E" Text="Intergalaktikus drogdiler" TextWrapping="WrapWithOverflow" FontSize="10px"></TextBlock>
+        <Rectangle x:Name="albumImg" Margin="36,89,0,0" Stroke="#6E6E6E" StrokeThickness="3" VerticalAlignment="Top" HorizontalAlignment="Left" Width="94"  Height="95"  />
+    </Grid>
+</UserControl>

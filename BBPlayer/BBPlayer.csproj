@@ -9,10 +9,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="img\playicon.png" />
+    <None Remove="img\prev_icon.png" />
+    <None Remove="img\Sanyi.png" />
+    <None Remove="play-icon.jpg" />
+    <None Remove="prev_icon.png" />
+    <None Remove="Sanyi.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NAudio" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="TagLibSharp" Version="2.3.0" />
     <PackageReference Include="WindowsAPICodePack" Version="7.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="img\playicon.png" />
+    <Resource Include="img\prev_icon.png" />
+    <Resource Include="img\Sanyi.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="play-icon.jpg" />
+    <Resource Include="prev_icon.png" />
+    <Resource Include="Sanyi.png" />
   </ItemGroup>
 
 </Project>

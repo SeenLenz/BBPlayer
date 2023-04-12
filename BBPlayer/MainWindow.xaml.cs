@@ -573,7 +573,7 @@ namespace BBPlayer
             }
         }
 
-        private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
+        private void closeWindow1(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
             CancellationToken.Cancel();
@@ -640,16 +640,16 @@ namespace BBPlayer
                 }
             }
         }
-        private void bt_ListDirectories(object sender, RoutedEventArgs e)
-        {
-            Directories.Text = "";
+        //private void bt_listdirectories(object sender, RoutedEventArgs e)
+        //{
+        //    directories.text = "";
 
-            foreach (var entry in this.MediaLibrary)
-            {
-                Directories.Text += $"\n\nKey: {entry.Key}\nName: {entry.Value.Title}\nTrack: {entry.Value.Track}\nYear: {entry.Value.Year}\nGenre: {entry.Value.Genre}\nAlbum: {entry.Value.Album}\nArtist: {entry.Value.Artist}\nDisc: {entry.Value.Disc}\nDuration: {entry.Value.Duration}\nPath: {entry.Value.Path}\n";
-            }
+        //    foreach (var entry in this.medialibrary)
+        //    {
+        //        directories.text += $"\n\nkey: {entry.key}\nname: {entry.value.title}\ntrack: {entry.value.track}\nyear: {entry.value.year}\ngenre: {entry.value.genre}\nalbum: {entry.value.album}\nartist: {entry.value.artist}\ndisc: {entry.value.disc}\nduration: {entry.value.duration}\npath: {entry.value.path}\n";
+        //    }
 
-            //Directories.Text += $"\n\nKey: {this.SongInFocus.Key}\nName: {this.SongInFocus.Value.Title}\nTrack: {this.SongInFocus.Value.Track}\nYear: {this.SongInFocus.Value.Year}\nGenre: {this.SongInFocus.Value.Genre}\nAlbum: {this.SongInFocus.Value.Album}\nArtist: {this.SongInFocus.Value.Artist}\nDisc: {this.SongInFocus.Value.Disc}\nDuration: {this.SongInFocus.Value.Duration}\nPath: {this.SongInFocus.Value.Path}\n";
+        //    //Directories.Text += $"\n\nKey: {this.SongInFocus.Key}\nName: {this.SongInFocus.Value.Title}\nTrack: {this.SongInFocus.Value.Track}\nYear: {this.SongInFocus.Value.Year}\nGenre: {this.SongInFocus.Value.Genre}\nAlbum: {this.SongInFocus.Value.Album}\nArtist: {this.SongInFocus.Value.Artist}\nDisc: {this.SongInFocus.Value.Disc}\nDuration: {this.SongInFocus.Value.Duration}\nPath: {this.SongInFocus.Value.Path}\n";
 
         }
         private void bt_Play(object sender, RoutedEventArgs e) 
@@ -1080,6 +1080,33 @@ namespace BBPlayer
 
 
         #endregion
+        private void switchToLocalFiles(object sender, RoutedEventArgs e)
+        {
+            localfiles ablak = new localfiles();
+            Application.Current.MainWindow.Content = ablak.Content;
+        }
+        void rectangle_MouseLeftButtonDown(object sender, RoutedEventArgs e)
+        {
+            Playlist playlistpage = new();
+            Application.Current.MainWindow.Content = playlistpage.Content;
+        }
+        int clickcounter = 1;
+        private void bt_PlaySong_Click(object sender, RoutedEventArgs e)
+        {
+            clickcounter++;
+            if (clickcounter % 2 == 0)
+            {
+                bt_PlaySong.Content = "||";
+            }
+            else
+            {
+                bt_PlaySong.Content = ">";
+            }
+        }
+        void AddPlaylist(object sender, RoutedEventArgs e)
+        {
+
+        }
 
         
 
