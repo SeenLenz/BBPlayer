@@ -4,6 +4,7 @@ using NAudio.Wave;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -84,6 +85,14 @@ namespace BBPlayer
         public bool isShuffle = false;
         public bool isReplay = false;
         public bool isReplayInfinite = false;
+        public int PlaybackState = 0;
+        public bool Pause = false;
+        public int státusz = 0;
+        public int jelenlegislidermax = 0;
+        public string savedfilename;
+        public bool isdragged = false;
+        public Random random = new Random();
+
 
         private Config _config;
         public Config Config
@@ -103,6 +112,7 @@ namespace BBPlayer
             }
             set { _id = value; }
         }
+
 
 
         private string[] _folders = new string[] { };
@@ -310,6 +320,11 @@ namespace BBPlayer
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = System.Threading.Tasks.Task.Run(() => MediaTask());
             this.FileTask = System.Threading.Tasks.Task.Run(() => BackgroundTask());
+            if(status != null)
+            {
+                Slider.IsEnabled = false;
+                status.IsEnabled = false;
+            }
             Closing += WindowEventClose;
 
             CollectionView sortview = (CollectionView)CollectionViewSource.GetDefaultView(SongPanel.ItemsSource); ;
@@ -323,8 +338,13 @@ namespace BBPlayer
                 try
                 {
                     Song song = this.Playback_MessageQueue.Take(this.CancellationToken.Token);
-                    this.outputDevice.Init(new AudioFileReader(song.Path));
+                    this.outputDevice.Init(this.audioFile = new AudioFileReader(song.Path));
                     outputDevice.Play();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        outputDevice.Volume = Convert.ToSingle(volume.Value) / 100;
+                    });
+                    
                 }
                 catch (OperationCanceledException)
                 {
@@ -380,6 +400,67 @@ namespace BBPlayer
             watcher.Renamed += DirectoryEventRenamed;
 
             this.Watchers.TryAdd(path, watcher);
+        }
+
+       private void PlayingStateSeconds()
+        {
+            while ((!this.CancellationToken.Token.IsCancellationRequested))
+            {
+
+                if (status != null)
+                {
+                       
+                    
+                    while (SongInFocus.Key != null && this.PlaybackState != (int)SongInFocus.Value.Duration.TotalSeconds && this.Pause == false)
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            Slider.IsEnabled = true;
+                            status.IsEnabled = true;
+                        });
+                        
+
+                        if (jelenlegislidermax != (int)SongInFocus.Value.Duration.TotalSeconds)
+                        {
+                            int slidernum = (int)SongInFocus.Value.Duration.TotalSeconds;
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                Slider.Maximum = slidernum;
+                            });
+                            jelenlegislidermax = slidernum;
+                        }
+                        this.PlaybackState += 1;
+                        string csere;
+                        decimal minute = Math.Floor((decimal)this.PlaybackState / 60);
+                        if(this.PlaybackState - minute * 60 < 10)
+                        {
+                            csere = $"{minute}:0{this.PlaybackState - minute * 60}";
+                        }
+                        else
+                        {
+                            csere = $"{minute}:{this.PlaybackState - minute * 60}";
+                        }
+
+                        if (isdragged == false)
+                        {
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                Slider.Value = this.PlaybackState;
+                            });
+                        }
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            status.Content = csere;
+                        });
+                        
+                        if (PlaybackState == jelenlegislidermax)
+                        {
+                            Replay_OnSongEnd();
+                        }
+                        Thread.Sleep(1000);
+                    }
+                }
+            }
         }
 
         #endregion
@@ -571,10 +652,34 @@ namespace BBPlayer
             //Directories.Text += $"\n\nKey: {this.SongInFocus.Key}\nName: {this.SongInFocus.Value.Title}\nTrack: {this.SongInFocus.Value.Track}\nYear: {this.SongInFocus.Value.Year}\nGenre: {this.SongInFocus.Value.Genre}\nAlbum: {this.SongInFocus.Value.Album}\nArtist: {this.SongInFocus.Value.Artist}\nDisc: {this.SongInFocus.Value.Disc}\nDuration: {this.SongInFocus.Value.Duration}\nPath: {this.SongInFocus.Value.Path}\n";
 
         }
-        private void bt_Play(object sender, RoutedEventArgs e) { PlaySong(); }
+        private void bt_Play(object sender, RoutedEventArgs e) 
+        {
+            if (bt_play.Content.ToString() == "Play")
+            {
+                PlaySong();
+                bt_play.Content = "Pause";
+            }
+            else
+            {
+                PauseSong();
+                bt_play.Content = "Play";
+            }
+
+        }
         private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
-        private void bt_Stop(object sender, RoutedEventArgs e) { StopSong(); }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
+        private void bt_Replay(object sender, RoutedEventArgs e){ Replay(); }
+        private void DragStarted(object sender, DragStartedEventArgs e) { onDragStarted(); }
+        private void bt_shuffle(object sender, RoutedEventArgs e) { Shuffle(); }
+        
+        private void DragCompleted(object sender, RoutedEventArgs e) { Drag(); }
+        private void volume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e){ vol(e.NewValue); }
+
+        private void vol(double e)
+        {
+            float x = Convert.ToSingle(e) / 100;
+            outputDevice.Volume = x;
+        }
         #endregion
 
         #region Event Handlers
@@ -622,6 +727,7 @@ namespace BBPlayer
         }
         public void OnPlaybackStopped(object sender, StoppedEventArgs e)
         {
+
         }
         #endregion
 
@@ -664,20 +770,313 @@ namespace BBPlayer
         #endregion
 
         #region Playback Actions
-        private void Replay() { }
-        private void Shuffle() { }
+        private void Replay() {
+            if(this.isReplay == false && isReplayInfinite == false)
+            {
+                this.isReplay = true;
 
-        private void PreviousSong() { this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[--SongPanel.SelectedIndex])]; }
-        private void NextSong() { this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])]; }
+                replay.Content = "Replay on";
+                
+            }
+            else if(this.isReplay == true)
+            {
+                this.isReplay = false;
+                this.isReplayInfinite = true;
+
+                replay.Content = "Inf Replay";
+
+            }
+            else
+            {
+                this.isReplayInfinite = false;
+
+                replay.Content = "Replay off";
+                
+            }
+        }
+        private void Replay_OnSongEnd()
+        {
+            if(this.isShuffle == true)
+            {
+                if(this.isReplayInfinite == true)
+                {
+                    PauseSong();
+                    this.PlaybackState = 0;
+                    this.státusz = 0;
+                    this.audioFile.Position = 0;
+
+                    PlaySong();
+                }
+                else
+                {
+                    int x = random.Next(0, SongList.Count-1);
+                    if (SongIndex == x)
+                    {
+                        Replay_OnSongEnd();
+                    }
+                    else
+                    {
+                        PauseSong();
+                        this.PlaybackState = 0;
+                        this.státusz = 0;
+                        this.audioFile.Position = 0;
+                        this.SongInFocus = SongList[x];
+                        PlaySong();
+                    }
+                }
+            }
+            else if(this.isReplay == true)
+            {
+                if (this.SongInFocus.Value == this.SongList[SongList.Count-1].Value) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
+                {
+                    PauseSong();
+                    this.SongInFocus = this.SongList[0];
+                    SongIndex = 0;
+                    this.outputDevice.Stop();
+                    this.outputDevice.Dispose();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        status.Content = "0:00";
+                        this.státusz = 0;
+                        this.PlaybackState = 0;
+                        Slider.Value = 0;
+                    });
+                    PlaySong();
+                }
+                else
+                {
+                    PauseSong();
+                    if (SongIndex + 1 != SongList.Count)
+                    {
+                        this.SongInFocus = this.SongList[++SongIndex];
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            status.Content = "0:00";
+                            this.státusz = 0;
+                            this.PlaybackState = 0;
+                            Slider.Value = 0;
+                        });
+                    }
+                    this.outputDevice.Stop();
+                    this.outputDevice.Dispose();
+                    PlaySong();
+                }
+            }
+            else if(this.isReplayInfinite == true)
+            {
+                PauseSong();
+                this.PlaybackState = 0;
+                this.státusz = 0;
+                this.audioFile.Position = 0;
+
+                PlaySong();
+            }
+            else
+            {
+                PauseSong();
+            }
+        }
+        private void Shuffle() 
+        {
+            if(this.isShuffle == false )
+            {
+                this.isShuffle = true;
+
+                shuf.Content = "Shuffle on";
+
+            }
+            else
+            {
+                this.isShuffle = false;
+
+                shuf.Content = "Shuffle off";
+
+            }
+        }
+        private void PreviousSong() {
+            if (PlaybackState < 20) // lejátszás nem a szám első 20 mp-jében van
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    status.Content = "0:00";
+                    this.státusz = 0;
+                    this.PlaybackState = 0;
+                    Slider.Value = 0;
+                    this.outputDevice.Stop();
+                });
+                PlaySong();
+            }
+            else if (SongIndex -1 != -1)
+            {
+                this.SongInFocus = this.SongList[--SongIndex];
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    status.Content = "0:00";
+                    this.státusz = 0;
+                    this.PlaybackState = 0;
+                    Slider.Value = 0;
+                    this.outputDevice.Stop();
+                    this.outputDevice.Dispose();
+                });
+                PlaySong();
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    status.Content = "0:00";
+                    this.státusz = 0;
+                    this.PlaybackState = 0;
+                    Slider.Value = 0;
+                    this.outputDevice.Stop();
+                });
+                PlaySong();
+            }
+            
+
+        }
+        private void NextSong() {
+            if (SongIndex + 1 != SongList.Count)
+            {
+                this.SongInFocus = this.SongList[++SongIndex];
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    status.Content = "0:00";
+                    this.státusz = 0;
+                    this.PlaybackState = 0;
+                    Slider.Value = 0;
+                    this.outputDevice.Stop();
+                    this.outputDevice.Dispose();
+                });
+                this.PlaySong();
+            }
+            
+
+        }
+        //private void Replay() { }
+        //private void Shuffle() { }
+
+        //private void PreviousSong() { this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[--SongPanel.SelectedIndex])]; }
+        //private void NextSong() { this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])]; }
 
         private void PlaySong()
         {
-            Playback_MessageQueue.Add(this.SongInFocus);
+            if (this.PlaybackStateTask == null || this.PlaybackStateTask.Status != TaskStatus.Running)
+            {
+            this.Playback_MessageQueue.Add(this.SongInFocus.Value);
+            this.PlaybackStateTask = Task.Run(() => PlayingStateSeconds());
+            }
+            else
+            {
+                if (SongInFocus.Value.FileName == savedfilename)
+                {
+                    this.Pause = false;
+                    int sampleRate = audioFile.WaveFormat.SampleRate;
+                    int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
+                    int channels = audioFile.WaveFormat.Channels;
+                    this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
+
+                    this.outputDevice.Init(audioFile);
+                    this.outputDevice.Play();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        outputDevice.Volume = Convert.ToSingle(volume.Value) / 100;
+                    });
+                }
+                else
+                {
+                    this.Playback_MessageQueue.Add(this.SongInFocus.Value);
+
+                    this.Pause = false;
+                    int sampleRate = audioFile.WaveFormat.SampleRate;
+                    int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
+                    int channels = audioFile.WaveFormat.Channels;
+                    this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
+
+
+
+                    //this.outputDevice.Init(audioFile);
+                }
+               
+            }
         }
-        private void PauseSong() { }
-        private void StopSong() { this.outputDevice.Stop(); }
+        private void PauseSong() 
+        {
+            
+            if (this.Pause == false)
+            {
+                this.Pause = true;
+                decimal minute = Math.Floor((decimal)PlaybackState / 60);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    string temp = status.Content.ToString();
+                    string min = temp.Split(':')[0];
+                    string sec = temp.Split(':')[1];
+                    int time = (int.Parse(min) * 60) + int.Parse(sec);
+                    this.státusz = time;
+                    this.outputDevice.Stop();
+                });
+                savedfilename = this.SongInFocus.Value.FileName;
+                
+            }
+        }
+        private void onDragStarted()
+        {
+            isdragged = true;
+        }
+        
+        private void Drag()
+        {
+            this.outputDevice.Stop();
+            isdragged = false;
+            int érték = Convert.ToInt32(Slider.Value);
+            int sampleRate = audioFile.WaveFormat.SampleRate;
+            int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
+            int channels = audioFile.WaveFormat.Channels;
+            this.audioFile.Position = SecondsToBytes(érték, sampleRate, channels, bitsPerSample);
+            this.outputDevice.Init(audioFile);
+            PlaybackState = érték;
+            Slider.Value = érték;
+            string csere;
+            decimal minute = Math.Floor((decimal)this.PlaybackState / 60);
+            if (this.PlaybackState - minute * 60 < 10)
+            {
+                csere = $"{minute}:0{this.PlaybackState - minute * 60}";
+            }
+            else
+            {
+                csere = $"{minute}:{this.PlaybackState - minute * 60}";
+            }
+            status.Content = csere;
+            this.outputDevice.Play();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                outputDevice.Volume = Convert.ToSingle(volume.Value) / 100;
+            });
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                bt_play.Content = "Pause";
+            });
+        }
+
         #endregion
 
+        #region Conversions
+        public static long SecondsToBytes(double durationInSeconds, int sampleRate, int channels, int bitsPerSample)
+        {
+            long bytes = (long)(durationInSeconds * sampleRate * channels * bitsPerSample / 8);
+            Debug.WriteLine(bytes);
+            return bytes;
+        }
+
+
+
+        #endregion
+
+        
 
     }
 }
