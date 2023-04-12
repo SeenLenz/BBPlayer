@@ -328,6 +328,7 @@ namespace BBPlayer
                 }
                 catch (OperationCanceledException)
                 {
+                }catch(InvalidOperationException) { 
                 }
             }
         }
@@ -582,12 +583,13 @@ namespace BBPlayer
         {
             System.Threading.Thread.Sleep(1000);
             Song temp = new Song(e.FullPath, ID);
-            this.MediaLibrary.TryAdd(e.Name,temp);
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                SongList.Add(temp);
-            });
-
+            if (!this.MediaLibrary.ContainsKey(e.Name)) {
+                this.MediaLibrary.TryAdd(e.Name, temp);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    SongList.Add(temp);
+                });
+            }
         }
         private void DirectoryEventDeleted(object source, FileSystemEventArgs e)
         {
