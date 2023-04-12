@@ -47,6 +47,7 @@ namespace BBPlayer
         public int jelenlegislidermax = 0;
         public string savedfilename;
         public bool isdragged = false;
+        public Random random = new Random();
 
 
         private Config _config;
@@ -452,6 +453,7 @@ namespace BBPlayer
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
         private void bt_Replay(object sender, RoutedEventArgs e){ Replay(); }
         private void DragStarted(object sender, DragStartedEventArgs e) { onDragStarted(); }
+        private void bt_shuffle(object sender, RoutedEventArgs e) { Shuffle(); }
         
         private void DragCompleted(object sender, RoutedEventArgs e) { Drag(); }
         private void volume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e){ vol(e.NewValue); }
@@ -561,7 +563,36 @@ namespace BBPlayer
         }
         private void Replay_OnSongEnd()
         {
-            if(this.isReplay == true)
+            if(this.isShuffle == true)
+            {
+                if(this.isReplayInfinite == true)
+                {
+                    PauseSong();
+                    this.PlaybackState = 0;
+                    this.státusz = 0;
+                    this.audioFile.Position = 0;
+
+                    PlaySong();
+                }
+                else
+                {
+                    int x = random.Next(0, SongList.Count-1);
+                    if (SongIndex == x)
+                    {
+                        Replay_OnSongEnd();
+                    }
+                    else
+                    {
+                        PauseSong();
+                        this.PlaybackState = 0;
+                        this.státusz = 0;
+                        this.audioFile.Position = 0;
+                        this.SongInFocus = SongList[x];
+                        PlaySong();
+                    }
+                }
+            }
+            else if(this.isReplay == true)
             {
                 if (this.SongInFocus.Value == this.SongList[SongList.Count-1].Value) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
                 {
@@ -613,9 +644,25 @@ namespace BBPlayer
                 PauseSong();
             }
         }
-        private void Shuffle() { }
+        private void Shuffle() 
+        {
+            if(this.isShuffle == false )
+            {
+                this.isShuffle = true;
+
+                shuf.Content = "Shuffle on";
+
+            }
+            else
+            {
+                this.isShuffle = false;
+
+                shuf.Content = "Shuffle off";
+
+            }
+        }
         private void PreviousSong() {
-            if (PlaybackState > 20) // lejátszás nem a szám első 20 mp-jében van
+            if (PlaybackState < 20) // lejátszás nem a szám első 20 mp-jében van
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -729,23 +776,13 @@ namespace BBPlayer
                     string temp = status.Content.ToString();
                     string min = temp.Split(':')[0];
                     string sec = temp.Split(':')[1];
-                    int time = int.Parse(min) * 60 + int.Parse(sec);
+                    int time = (int.Parse(min) * 60) + int.Parse(sec);
                     this.státusz = time;
                     this.outputDevice.Stop();
                 });
                 savedfilename = this.SongInFocus.Value.FileName;
                 
             }
-            //else if(this.Pause == true)
-            //{
-            //    this.Pause = false;
-            //    int sampleRate = audioFile.WaveFormat.SampleRate;
-            //    int bitsPerSample = audioFile.WaveFormat.BitsPerSample;
-            //    int channels = audioFile.WaveFormat.Channels;
-            //    this.audioFile.Position = SecondsToBytes(státusz, sampleRate, channels, bitsPerSample);
-            //    this.outputDevice.Init(audioFile);
-            //    this.outputDevice.Play();
-            //}
         }
         private void onDragStarted()
         {
@@ -780,8 +817,11 @@ namespace BBPlayer
             {
                 outputDevice.Volume = Convert.ToSingle(volume.Value) / 100;
             });
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                bt_play.Content = "Pause";
+            });
         }
-
 
         #endregion
 
@@ -789,8 +829,10 @@ namespace BBPlayer
         public static long SecondsToBytes(double durationInSeconds, int sampleRate, int channels, int bitsPerSample)
         {
             long bytes = (long)(durationInSeconds * sampleRate * channels * bitsPerSample / 8);
+            Debug.WriteLine(bytes);
             return bytes;
         }
+
 
 
         #endregion

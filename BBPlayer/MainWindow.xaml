@@ -22,7 +22,7 @@
             <Button x:Name="bt_play" Content="Play" Width="56" Height="20px" Margin="5" Click="bt_Play"/>
             <Button Content="Next" Width="57" Height="20px" Margin="5" Click="bt_Next"/>
             <Button Content="ListDirs" Width="56" Height="20px" Margin="5" Click="bt_ListDirectories"/>
-            <Slider x:Name="Slider" Width="150" Height="18" Maximum="200" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted"/> 
+            <Slider x:Name="Slider" Width="150" Height="18" Maximum="200" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted"/>
             <Label x:Name="status" Content="0:00" />
             <Slider x:Name="volume" Value="100" Width="100" Height="22" Minimum="0" Maximum="100" ValueChanged="volume_ValueChanged"/>
         </StackPanel>
@@ -46,6 +46,7 @@
                 <userControls:SongRow />
             </StackPanel>
         </ScrollViewer>
+        <Button x:Name="shuf" Content="Shuffle off" HorizontalAlignment="Left" Margin="89,17,0,0" Grid.Row="1" VerticalAlignment="Top" Width="61" Click="bt_shuffle"/>
 
     </Grid>
 </Window>
