@@ -28,7 +28,7 @@ namespace BBPlayer.Classes
         public bool isExperimental { get; set; }
 
         public int uid { get; set; }
-        public BBPlayer.MainWindow.SortTypes CurrentSort;
+        public MainWindow.SortTypes CurrentSort;
 
         public Config()
         {
