@@ -39,9 +39,9 @@
                     <Image x:Name="CurrentTrackImg" Style="{StaticResource AlbumCover}" Source="/Sanyi.png" Height="82" Width="82"/>
                 </Border>
             </StackPanel>
-            <Button x:Name="closeWindow" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20" Margin="0,0,18,10" Panel.ZIndex="10" Click="closeWindow1">
-                   X             
-            </Button>
+            <Button x:Name="closeWindow" BorderBrush="Transparent" Background="Transparent" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20"  Panel.ZIndex="10" Click="closeWindow1">
+                <Image Source="/CloseIcon.png" Stretch="Fill"></Image>
+            </Button> 
             <Grid Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition></RowDefinition>

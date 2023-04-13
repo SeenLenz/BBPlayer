@@ -28,8 +28,8 @@
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
-            <Button x:Name="closeWindow" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20" Margin="0,0,18,10" Panel.ZIndex="10" Click="closeWindow1">
-                X
+            <Button x:Name="closeWindow" BorderBrush="Transparent" Background="Transparent" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20" Margin="0,0,18,10" Panel.ZIndex="10" Click="closeWindow1">
+                <Image Source="/CloseIcon.png" Stretch="Fill"></Image>
             </Button>
             <StackPanel x:Name="controlBar" Background="Black" Opacity="0.8" Grid.RowSpan="2">
                 <Button x:Name="btn_Title" Style="{StaticResource Title}" Click="switchToMainMenu" />

@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="CloseIcon.png" />
     <None Remove="play-icon.jpg" />
     <None Remove="prev_icon.png" />
     <None Remove="Sanyi.png" />
@@ -22,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="CloseIcon.png" />
     <Resource Include="play-icon.jpg" />
     <Resource Include="prev_icon.png" />
     <Resource Include="Sanyi.png" />
