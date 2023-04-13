@@ -26,6 +26,8 @@ using System.Reflection;
 using Microsoft.VisualBasic.ApplicationServices;
 using Newtonsoft.Json.Linq;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace BBPlayer
 {
@@ -81,7 +83,7 @@ namespace BBPlayer
 
         public Dictionary<string, Playlist> Playlists;
         public Dictionary<string, Album> Albums;
-
+        public bool play = false;
         public bool isShuffle = false;
         public bool isReplay = false;
         public bool isReplayInfinite = false;
@@ -655,15 +657,25 @@ namespace BBPlayer
         //}
         private void bt_Play(object sender, RoutedEventArgs e)
         {
-            if (bt_play.Content.ToString() == "Play")
+            if (play == false)
             {
                 PlaySong();
-                bt_play.Content = "Pause";
+                play = true;
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("/img/pause.png");
+                bitmap.EndInit();
+                play_pic.Source = bitmap;
             }
             else
             {
                 PauseSong();
-                bt_play.Content = "Play";
+                play = false;
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("/img/play.png");
+                bitmap.EndInit();
+                play_pic.Source = bitmap;
             }
 
         }
@@ -671,7 +683,8 @@ namespace BBPlayer
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
         private void bt_Replay(object sender, RoutedEventArgs e) { Replay(); }
         private void DragStarted(object sender, DragStartedEventArgs e) { onDragStarted(); }
-        private void bt_shuffle(object sender, RoutedEventArgs e) { Shuffle(); }
+
+        private void bt_shuffle1(object sender, RoutedEventArgs e) { Shuffle(); }
 
         private void DragCompleted(object sender, RoutedEventArgs e) { Drag(); }
         private void volume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { vol(e.NewValue); }
@@ -777,8 +790,12 @@ namespace BBPlayer
             if (this.isReplay == false && isReplayInfinite == false)
             {
                 this.isReplay = true;
-
-                replay.Content = "Replay on";
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("/img/repeat_on.png");
+                bitmap.EndInit();
+                replay_pic.Source = bitmap;
+               
 
             }
             else if (this.isReplay == true)
@@ -786,14 +803,22 @@ namespace BBPlayer
                 this.isReplay = false;
                 this.isReplayInfinite = true;
 
-                replay.Content = "Inf Replay";
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("/img/infreplay.png");
+                bitmap.EndInit();
+                replay_pic.Source = bitmap;
 
             }
             else
             {
                 this.isReplayInfinite = false;
 
-                replay.Content = "Replay off";
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("/img/repeat.png");
+                bitmap.EndInit();
+                replay_pic.Source = bitmap;
 
             }
         }
@@ -886,14 +911,22 @@ namespace BBPlayer
             {
                 this.isShuffle = true;
 
-                shuf.Content = "Shuffle on";
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("/img/shuffle_on.png");
+                bitmap.EndInit();
+                shuffle_pic.Source = bitmap;
 
             }
             else
             {
                 this.isShuffle = false;
 
-                shuf.Content = "Shuffle off";
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("/img/shuffle.png");
+                bitmap.EndInit();
+                shuffle_pic.Source = bitmap;
 
             }
         }
@@ -1068,7 +1101,11 @@ namespace BBPlayer
             });
             Application.Current.Dispatcher.Invoke(() =>
             {
-                bt_play.Content = "Pause";
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("/img/play.png");
+                bitmap.EndInit();
+                play_pic.Source = bitmap;
             });
         }
 
@@ -1084,9 +1121,8 @@ namespace BBPlayer
 
 
 
+
+
         #endregion
-
-
-
     }
 }
