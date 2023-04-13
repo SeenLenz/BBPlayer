@@ -36,5 +36,14 @@ namespace BBPlayer
             MainWindow mainWindow = new MainWindow();
             Application.Current.MainWindow.Content = mainWindow.Content;
         }
+
+        private void closeWindow1(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+        private void AddPlaylist(object sender, RoutedEventArgs e)
+        {
+            
+        }
     }
 }
