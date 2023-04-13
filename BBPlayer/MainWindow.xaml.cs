@@ -314,13 +314,13 @@ namespace BBPlayer
 
             InitializeComponent();
             SongPanel.ItemsSource = SongList;
-            
+
             this.view = CollectionViewSource.GetDefaultView(SongPanel.ItemsSource);
             SongPanel.SelectionMode = SelectionMode.Single;
             this.outputDevice.PlaybackStopped += OnPlaybackStopped;
             this.PlaybackTask = System.Threading.Tasks.Task.Run(() => MediaTask());
             this.FileTask = System.Threading.Tasks.Task.Run(() => BackgroundTask());
-            if(status != null)
+            if (status != null)
             {
                 Slider.IsEnabled = false;
                 status.IsEnabled = false;
@@ -328,9 +328,9 @@ namespace BBPlayer
             Closing += WindowEventClose;
 
             CollectionView sortview = (CollectionView)CollectionViewSource.GetDefaultView(SongPanel.ItemsSource); ;
-            sortview.Filter = SongFilter;
+            //sortview.Filter = SongFilter;
         }
-        
+
         private void MediaTask()
         {
             while (!this.CancellationToken.Token.IsCancellationRequested)
@@ -344,18 +344,20 @@ namespace BBPlayer
                     {
                         outputDevice.Volume = Convert.ToSingle(volume.Value) / 100;
                     });
-                    
+
                 }
                 catch (OperationCanceledException)
                 {
-                }catch(InvalidOperationException) { 
+                }
+                catch (InvalidOperationException)
+                {
                 }
             }
         }
 
         private void BackgroundTask()
         {
-            
+
             if (this.SongList != null && this.SongList.Count != 0)
             {
                 this.SongInFocus = this.SongList[SongIndex];
@@ -402,15 +404,15 @@ namespace BBPlayer
             this.Watchers.TryAdd(path, watcher);
         }
 
-       private void PlayingStateSeconds()
+        private void PlayingStateSeconds()
         {
             while ((!this.CancellationToken.Token.IsCancellationRequested))
             {
 
                 if (status != null)
                 {
-                       
-                    
+
+
                     while (SongInFocus != null && this.PlaybackState != (int)SongInFocus.Duration.TotalSeconds && this.Pause == false)
                     {
                         Application.Current.Dispatcher.Invoke(() =>
@@ -418,7 +420,7 @@ namespace BBPlayer
                             Slider.IsEnabled = true;
                             status.IsEnabled = true;
                         });
-                        
+
 
                         if (jelenlegislidermax != (int)SongInFocus.Duration.TotalSeconds)
                         {
@@ -432,7 +434,7 @@ namespace BBPlayer
                         this.PlaybackState += 1;
                         string csere;
                         decimal minute = Math.Floor((decimal)this.PlaybackState / 60);
-                        if(this.PlaybackState - minute * 60 < 10)
+                        if (this.PlaybackState - minute * 60 < 10)
                         {
                             csere = $"{minute}:0{this.PlaybackState - minute * 60}";
                         }
@@ -452,7 +454,7 @@ namespace BBPlayer
                         {
                             status.Content = csere;
                         });
-                        
+
                         if (PlaybackState == jelenlegislidermax)
                         {
                             Replay_OnSongEnd();
@@ -507,18 +509,18 @@ namespace BBPlayer
 
         #region Gui Event Handlers
 
-        private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            CollectionViewSource.GetDefaultView(SongPanel.ItemsSource).Refresh();
-        }
+        //private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    CollectionViewSource.GetDefaultView(SongPanel.ItemsSource).Refresh();
+        //}
 
-        private bool SongFilter(object item)
-        {
-            if (String.IsNullOrEmpty(txtSearch.Text))
-                return true;
-            else
-                return ((item as Song).Title.IndexOf(txtSearch.Text, StringComparison.OrdinalIgnoreCase) >= 0);
-        }
+        //private bool SongFilter(object item)
+        //{
+        //    if (String.IsNullOrEmpty(txtSearch.Text))
+        //        return true;
+        //    else
+        //        return ((item as Song).Title.IndexOf(txtSearch.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        //}
 
         private void SongFocusChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -530,7 +532,7 @@ namespace BBPlayer
             {
                 this.SongInFocus = this.SongList[0];
             }
-           
+
         }
 
         private void SortChanged(object sender, SelectionChangedEventArgs e)
@@ -540,7 +542,6 @@ namespace BBPlayer
             ComboBoxItem selectedItem = comboBox.SelectedItem as ComboBoxItem;
             string selectedContent = selectedItem.Content as string;
 
-            TestLabel.Content = selectedContent;
             view.SortDescriptions.Clear();
             switch (selectedContent)
             {
@@ -573,7 +574,7 @@ namespace BBPlayer
             }
         }
 
-        private void closeWindow1(object sender, System.ComponentModel.CancelEventArgs e)
+        private void WindowEventClose(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
             CancellationToken.Cancel();
@@ -640,19 +641,19 @@ namespace BBPlayer
                 }
             }
         }
-        //private void bt_listdirectories(object sender, RoutedEventArgs e)
+        //private void bt_ListDirectories(object sender, RoutedEventArgs e)
         //{
-        //    directories.text = "";
+        //    Directories.Text = "";
 
-        //    foreach (var entry in this.medialibrary)
+        //    foreach (var entry in this.MediaLibrary)
         //    {
-        //        directories.text += $"\n\nkey: {entry.key}\nname: {entry.value.title}\ntrack: {entry.value.track}\nyear: {entry.value.year}\ngenre: {entry.value.genre}\nalbum: {entry.value.album}\nartist: {entry.value.artist}\ndisc: {entry.value.disc}\nduration: {entry.value.duration}\npath: {entry.value.path}\n";
+        //        Directories.Text += $"\n\nKey: {entry.Key}\nName: {entry.Value.Title}\nTrack: {entry.Value.Track}\nYear: {entry.Value.Year}\nGenre: {entry.Value.Genre}\nAlbum: {entry.Value.Album}\nArtist: {entry.Value.Artist}\nDisc: {entry.Value.Disc}\nDuration: {entry.Value.Duration}\nPath: {entry.Value.Path}\n";
         //    }
 
         //    //Directories.Text += $"\n\nKey: {this.SongInFocus.Key}\nName: {this.SongInFocus.Value.Title}\nTrack: {this.SongInFocus.Value.Track}\nYear: {this.SongInFocus.Value.Year}\nGenre: {this.SongInFocus.Value.Genre}\nAlbum: {this.SongInFocus.Value.Album}\nArtist: {this.SongInFocus.Value.Artist}\nDisc: {this.SongInFocus.Value.Disc}\nDuration: {this.SongInFocus.Value.Duration}\nPath: {this.SongInFocus.Value.Path}\n";
 
-        }
-        private void bt_Play(object sender, RoutedEventArgs e) 
+        //}
+        private void bt_Play(object sender, RoutedEventArgs e)
         {
             if (bt_play.Content.ToString() == "Play")
             {
@@ -668,12 +669,12 @@ namespace BBPlayer
         }
         private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
-        private void bt_Replay(object sender, RoutedEventArgs e){ Replay(); }
+        private void bt_Replay(object sender, RoutedEventArgs e) { Replay(); }
         private void DragStarted(object sender, DragStartedEventArgs e) { onDragStarted(); }
         private void bt_shuffle(object sender, RoutedEventArgs e) { Shuffle(); }
-        
+
         private void DragCompleted(object sender, RoutedEventArgs e) { Drag(); }
-        private void volume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e){ vol(e.NewValue); }
+        private void volume_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { vol(e.NewValue); }
 
         private void vol(double e)
         {
@@ -683,12 +684,13 @@ namespace BBPlayer
         #endregion
 
         #region Event Handlers
-      
+
         private void DirectoryEventCreated(object source, FileSystemEventArgs e)
         {
             System.Threading.Thread.Sleep(1000);
             Song temp = new Song(e.FullPath, ID);
-            if (!this.MediaLibrary.ContainsKey(e.Name)) {
+            if (!this.MediaLibrary.ContainsKey(e.Name))
+            {
                 this.MediaLibrary.TryAdd(e.Name, temp);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -770,15 +772,16 @@ namespace BBPlayer
         #endregion
 
         #region Playback Actions
-        private void Replay() {
-            if(this.isReplay == false && isReplayInfinite == false)
+        private void Replay()
+        {
+            if (this.isReplay == false && isReplayInfinite == false)
             {
                 this.isReplay = true;
 
                 replay.Content = "Replay on";
-                
+
             }
-            else if(this.isReplay == true)
+            else if (this.isReplay == true)
             {
                 this.isReplay = false;
                 this.isReplayInfinite = true;
@@ -791,14 +794,14 @@ namespace BBPlayer
                 this.isReplayInfinite = false;
 
                 replay.Content = "Replay off";
-                
+
             }
         }
         private void Replay_OnSongEnd()
         {
-            if(this.isShuffle == true)
+            if (this.isShuffle == true)
             {
-                if(this.isReplayInfinite == true)
+                if (this.isReplayInfinite == true)
                 {
                     PauseSong();
                     this.PlaybackState = 0;
@@ -809,7 +812,7 @@ namespace BBPlayer
                 }
                 else
                 {
-                    int x = random.Next(0, SongList.Count-1);
+                    int x = random.Next(0, SongList.Count - 1);
                     if (SongIndex == x)
                     {
                         Replay_OnSongEnd();
@@ -825,9 +828,9 @@ namespace BBPlayer
                     }
                 }
             }
-            else if(this.isReplay == true)
+            else if (this.isReplay == true)
             {
-                if (this.SongInFocus == this.SongList[SongList.Count-1]) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
+                if (this.SongInFocus == this.SongList[SongList.Count - 1]) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
                 {
                     PauseSong();
                     this.SongInFocus = this.SongList[0];
@@ -863,7 +866,7 @@ namespace BBPlayer
                     PlaySong();
                 }
             }
-            else if(this.isReplayInfinite == true)
+            else if (this.isReplayInfinite == true)
             {
                 PauseSong();
                 this.PlaybackState = 0;
@@ -877,9 +880,9 @@ namespace BBPlayer
                 PauseSong();
             }
         }
-        private void Shuffle() 
+        private void Shuffle()
         {
-            if(this.isShuffle == false )
+            if (this.isShuffle == false)
             {
                 this.isShuffle = true;
 
@@ -894,7 +897,8 @@ namespace BBPlayer
 
             }
         }
-        private void PreviousSong() {
+        private void PreviousSong()
+        {
             if (PlaybackState < 20) // lejátszás nem a szám első 20 mp-jében van
             {
                 Application.Current.Dispatcher.Invoke(() =>
@@ -907,7 +911,7 @@ namespace BBPlayer
                 });
                 PlaySong();
             }
-            else if (SongIndex -1 != -1)
+            else if (SongIndex - 1 != -1)
             {
                 this.SongInFocus = this.SongList[--SongIndex];
 
@@ -934,10 +938,11 @@ namespace BBPlayer
                 });
                 PlaySong();
             }
-            
+
 
         }
-        private void NextSong() {
+        private void NextSong()
+        {
             if (SongIndex + 1 != SongList.Count)
             {
                 this.SongInFocus = this.SongList[++SongIndex];
@@ -953,7 +958,7 @@ namespace BBPlayer
                 });
                 this.PlaySong();
             }
-            
+
 
         }
         //private void Replay() { }
@@ -966,8 +971,8 @@ namespace BBPlayer
         {
             if (this.PlaybackStateTask == null || this.PlaybackStateTask.Status != TaskStatus.Running)
             {
-            this.Playback_MessageQueue.Add(this.SongInFocus);
-            this.PlaybackStateTask = System.Threading.Tasks.Task.Run(() => PlayingStateSeconds());
+                this.Playback_MessageQueue.Add(this.SongInFocus);
+                this.PlaybackStateTask = System.Threading.Tasks.Task.Run(() => PlayingStateSeconds());
             }
             else
             {
@@ -1005,12 +1010,12 @@ namespace BBPlayer
 
                     //this.outputDevice.Init(audioFile);
                 }
-               
+
             }
         }
-        private void PauseSong() 
+        private void PauseSong()
         {
-            
+
             if (this.Pause == false)
             {
                 this.Pause = true;
@@ -1025,14 +1030,14 @@ namespace BBPlayer
                     this.outputDevice.Stop();
                 });
                 savedfilename = this.SongInFocus.FileName;
-                
+
             }
         }
         private void onDragStarted()
         {
             isdragged = true;
         }
-        
+
         private void Drag()
         {
             this.outputDevice.Stop();
@@ -1080,35 +1085,8 @@ namespace BBPlayer
 
 
         #endregion
-        private void switchToLocalFiles(object sender, RoutedEventArgs e)
-        {
-            localfiles ablak = new localfiles();
-            Application.Current.MainWindow.Content = ablak.Content;
-        }
-        void rectangle_MouseLeftButtonDown(object sender, RoutedEventArgs e)
-        {
-            Playlist playlistpage = new();
-            Application.Current.MainWindow.Content = playlistpage.Content;
-        }
-        int clickcounter = 1;
-        private void bt_PlaySong_Click(object sender, RoutedEventArgs e)
-        {
-            clickcounter++;
-            if (clickcounter % 2 == 0)
-            {
-                bt_PlaySong.Content = "||";
-            }
-            else
-            {
-                bt_PlaySong.Content = ">";
-            }
-        }
-        void AddPlaylist(object sender, RoutedEventArgs e)
-        {
 
-        }
 
-        
 
     }
 }
