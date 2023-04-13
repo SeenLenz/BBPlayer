@@ -1098,5 +1098,16 @@ namespace BBPlayer
             Playlist Playlistpage = new();
             Application.Current.MainWindow.Content = Playlistpage.Content;
         }
+
+        private void switchToLocalFiles(object sender, RoutedEventArgs e)
+        {
+            localfiles localfiles = new();
+            Application.Current.MainWindow.Content = localfiles.Content;
+        }
+
+        private void closeWindow1(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }
