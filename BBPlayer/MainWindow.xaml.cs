@@ -340,7 +340,8 @@ namespace BBPlayer
                 try
                 {
                     Song song = this.Playback_MessageQueue.Take(this.CancellationToken.Token);
-                    this.outputDevice.Init(this.audioFile = new AudioFileReader(song.Path));
+                    this.audioFile = new AudioFileReader(song.Path);
+                    this.outputDevice.Init(this.audioFile);
                     outputDevice.Play();
                     Application.Current.Dispatcher.Invoke(() =>
                     {
@@ -663,7 +664,7 @@ namespace BBPlayer
                 play = true;
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/pause.png");
+                bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
                 bitmap.EndInit();
                 play_pic.Source = bitmap;
             }
@@ -673,7 +674,7 @@ namespace BBPlayer
                 play = false;
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/play.png");
+                bitmap.UriSource = new Uri("/img/play.png", UriKind.Relative);
                 bitmap.EndInit();
                 play_pic.Source = bitmap;
             }
@@ -1125,26 +1126,14 @@ namespace BBPlayer
 
         #endregion
 
-        private void btn_Playlists_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void switchToPlaylists(object sender, RoutedEventArgs e)
-        {
-            Playlist Playlistpage = new();
-            Application.Current.MainWindow.Content = Playlistpage.Content;
-        }
-
-        private void switchToLocalFiles(object sender, RoutedEventArgs e)
-        {
-            localfiles localfiles = new();
-            Application.Current.MainWindow.Content = localfiles.Content;
-        }
-
         private void closeWindow1(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private void btn_Title_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

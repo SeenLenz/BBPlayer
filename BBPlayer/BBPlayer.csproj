@@ -10,8 +10,17 @@
 
   <ItemGroup>
     <None Remove="CloseIcon.png" />
-    <None Remove="play-icon.jpg" />
-    <None Remove="prev_icon.png" />
+    <None Remove="img\CloseIcon.png" />
+    <None Remove="img\infinitereplay.png" />
+    <None Remove="img\infreplay.png" />
+    <None Remove="img\next.png" />
+    <None Remove="img\pause.png" />
+    <None Remove="img\play.png" />
+    <None Remove="img\previous.png" />
+    <None Remove="img\repeat.png" />
+    <None Remove="img\repeat_on.png" />
+    <None Remove="img\shuffle.png" />
+    <None Remove="img\shuffle_on.png" />
     <None Remove="Sanyi.png" />
   </ItemGroup>
 
@@ -24,8 +33,17 @@
 
   <ItemGroup>
     <Resource Include="CloseIcon.png" />
-    <Resource Include="play-icon.jpg" />
-    <Resource Include="prev_icon.png" />
+    <Resource Include="img\CloseIcon.png" />
+    <Resource Include="img\infinitereplay.png" />
+    <Resource Include="img\infreplay.png" />
+    <Resource Include="img\next.png" />
+    <Resource Include="img\pause.png" />
+    <Resource Include="img\play.png" />
+    <Resource Include="img\previous.png" />
+    <Resource Include="img\repeat.png" />
+    <Resource Include="img\repeat_on.png" />
+    <Resource Include="img\shuffle.png" />
+    <Resource Include="img\shuffle_on.png" />
     <Resource Include="Sanyi.png" />
   </ItemGroup>
 
