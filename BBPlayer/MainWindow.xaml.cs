@@ -674,7 +674,7 @@ namespace BBPlayer
                 play = false;
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/play.png", UriKind.Relative);
+                bitmap.UriSource = new Uri("./img/play.png", UriKind.Relative);
                 bitmap.EndInit();
                 play_pic.Source = bitmap;
             }
@@ -793,7 +793,7 @@ namespace BBPlayer
                 this.isReplay = true;
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/repeat_on.png");
+                bitmap.UriSource = new Uri("./img/repeat_on.png", UriKind.Relative);
                 bitmap.EndInit();
                 replay_pic.Source = bitmap;
                
@@ -806,7 +806,7 @@ namespace BBPlayer
 
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/infreplay.png");
+                bitmap.UriSource = new Uri("./img/infreplay.png", UriKind.Relative);
                 bitmap.EndInit();
                 replay_pic.Source = bitmap;
 
@@ -817,7 +817,7 @@ namespace BBPlayer
 
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/repeat.png");
+                bitmap.UriSource = new Uri("./img/repeat.png", UriKind.Relative);
                 bitmap.EndInit();
                 replay_pic.Source = bitmap;
 
@@ -914,7 +914,7 @@ namespace BBPlayer
 
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/shuffle_on.png");
+                bitmap.UriSource = new Uri("./img/shuffle_on.png", UriKind.Relative);
                 bitmap.EndInit();
                 shuffle_pic.Source = bitmap;
 
@@ -925,7 +925,7 @@ namespace BBPlayer
 
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/shuffle.png");
+                bitmap.UriSource = new Uri("./img/shuffle.png", UriKind.Relative);
                 bitmap.EndInit();
                 shuffle_pic.Source = bitmap;
 
@@ -1104,7 +1104,7 @@ namespace BBPlayer
             {
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("/img/play.png");
+                bitmap.UriSource = new Uri("./img/play.png", UriKind.Relative);
                 bitmap.EndInit();
                 play_pic.Source = bitmap;
             });
