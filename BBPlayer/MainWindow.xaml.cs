@@ -1084,9 +1084,19 @@ namespace BBPlayer
 
 
 
+
+
         #endregion
 
+        private void btn_Playlists_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
 
+        private void switchToPlaylists(object sender, RoutedEventArgs e)
+        {
+            Playlist Playlistpage = new();
+            Application.Current.MainWindow.Content = Playlistpage.Content;
+        }
     }
 }
