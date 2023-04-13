@@ -46,5 +46,11 @@ namespace BBPlayer
         {
             Application.Current.Shutdown();
         }
+
+        private void switchToPlaylists(object sender, RoutedEventArgs e)
+        {
+            Playlists playlistpage = new();
+            Application.Current.MainWindow.Content = playlistpage.Content;
+        }
     }
 }

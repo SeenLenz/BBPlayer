@@ -34,7 +34,7 @@
             <StackPanel x:Name="controlBar" Background="Black" Opacity="0.8" Grid.RowSpan="2">
                 <Button x:Name="btn_Title" Style="{StaticResource Title}" Click="switchToMainMenu" />
                 <Button x:Name="btn_LocalFiles" Style="{StaticResource MenuButton1}"/>
-                <Button x:Name="btn_Playlists" Style="{StaticResource MenuButton2}"/>
+                <Button x:Name="btn_Playlists" Style="{StaticResource MenuButton2}"   Click="switchToPlaylists"/>
                 <Button x:Name="btn_Favourites" Style="{StaticResource MenuButton3}"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="0" FlowDirection="LeftToRight">
