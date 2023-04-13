@@ -47,35 +47,55 @@
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
                 </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions> 
                     <ColumnDefinition Width="8*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="1" Grid.Row="0" x:Name="status" Content="0:00" Foreground="#6e6e6e"/>
 
-                <Slider  x:Name="volume" Value="100" Minimum="0" Maximum="100" ValueChanged="volume_ValueChanged" Margin="10,0,0,0" Grid.Column="1" Grid.Row="1" Style="{StaticResource TimeSlider}"/>
+                <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
+                    <Label Foreground="#6e6e6e" VerticalAlignment="Center" Width="26" RenderTransformOrigin="0.65,0.596">🔊</Label>
+                    <Slider VerticalAlignment="Center" x:Name="volume" Value="100" Minimum="0" Maximum="100" ValueChanged="volume_ValueChanged"  Grid.Column="1" Grid.Row="1" Style="{StaticResource TimeSlider}" Width="76"/>
+                </StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.3*"></ColumnDefinition>
                         <ColumnDefinition Width="0.5*"></ColumnDefinition>
                         <ColumnDefinition Width="0.5*"></ColumnDefinition>
                         <ColumnDefinition Width="0.5*"></ColumnDefinition>
-                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="0.5*"></ColumnDefinition>
+                        <ColumnDefinition Width="0.5*"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Label Style="{StaticResource MusicTitle}" VerticalAlignment="Center"/>
-                    <Button Grid.Column="1" Name="bt_PrevSong" Width="30" Height="30" Margin="10px 0px 0px 0px">
-                    </Button>
-                    <Button Grid.Column="2" Name="bt_PlaySong" Width="30" Margin="10,0,0,0" Height="30" Click="bt_PlaySong_Click" >
-                        <Image Source="/play-icon.jpg" Stretch="Fill">
-                            
+                    <Button Grid.Column="1" Name="bt_PreviousSong" Width="30" Margin="10,0,0,0" Height="30" Click="bt_PlaySong_Click" Background="Transparent" BorderBrush="Transparent" >
+                        <Image Source="/img/previous.png" Stretch="Fill" >
+
                         </Image>
                     </Button>
-                    <Button Grid.Column="3" Name="bt_NextSong" Width="30" Height="30" Margin="10px 0px 0px 0px" Content="▶|"></Button>
-                    <Button Grid.Column="4" Name="bt_Shuffle" Width="30" Height="30" Margin="10px 0px 0px 0px" HorizontalAlignment="Left">
-                     
+                    <Button Grid.Column="2" Name="bt_PlaySong" Width="30" Margin="10,0,0,0" Height="30" Click="bt_PlaySong_Click" Background="Transparent" BorderBrush="Transparent" >
+                        <Image Source="/img/play.png" Stretch="Fill" >
+
+                        </Image>
+                    </Button>
+                    <Button Grid.Column="3" Name="bt_NextSong" Width="30" Margin="10,0,0,0" Height="30" Click="bt_PlaySong_Click" Background="Transparent" BorderBrush="Transparent" >
+                        <Image Source="/img/next.png" Stretch="Fill" >
+
+                        </Image>
+                    </Button>
+                    <Button Grid.Column="4" Name="bt_replay" Width="30" Margin="10,0,0,0" Height="30" Click="bt_PlaySong_Click" Background="Transparent" BorderBrush="Transparent" >
+                        <Image Source="/img/repeat.png" Stretch="Fill" >
+
+                        </Image>
+                    </Button>
+                    <Button Grid.Column="5" Name="bt_shuffle" Width="30" Margin="10,0,0,0" Height="30" Click="bt_PlaySong_Click" Background="Transparent" BorderBrush="Transparent" >
+                        <Image Source="/img/shuffle.png" Stretch="Fill" >
+
+                        </Image>
                     </Button>
                 </Grid>
-                <Slider x:Name="Slider" Maximum="200" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" Style="{StaticResource TimeSlider}" Grid.Column="0" Margin="0,0,0,2" Grid.Row="1"/>
+                <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal">
+                    <Label  x:Name="status" Content="0:00" Foreground="#6e6e6e" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                    <Slider x:Name="Slider" Maximum="200" VerticalAlignment="Center" Thumb.DragCompleted="DragCompleted" Thumb.DragStarted="DragStarted" Style="{StaticResource TimeSlider}" Grid.Column="0"  Grid.Row="1" Width="483"/>
+                </StackPanel>
             </Grid>
             <ListView Name="SongPanel" Grid.Column="1" Background="Transparent" SelectionChanged="SongFocusChanged" VirtualizingPanel.IsVirtualizing="True" SelectionMode="Multiple" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListView.ItemTemplate>
