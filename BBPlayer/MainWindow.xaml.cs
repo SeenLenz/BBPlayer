@@ -28,6 +28,7 @@ using Newtonsoft.Json.Linq;
 using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Globalization;
 
 namespace BBPlayer
 {
