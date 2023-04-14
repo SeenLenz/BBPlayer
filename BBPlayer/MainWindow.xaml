@@ -31,10 +31,8 @@
             <StackPanel x:Name="ControlBar" Background="Black" Opacity="0.8" Grid.RowSpan="2"  Height="auto" Width="auto">
                 <Button x:Name="btn_Title" Style="{StaticResource Title}" Click="bt_AddFolder"/>
                 <TextBox Name="txtSearch" TextChanged="txtSearch_TextChanged" Width="140"  />
-            </StackPanel>
                 <Button x:Name="localfiles" Style="{StaticResource MenuButton1}" ></Button> <!--csak hogy ne legyen ures a panek-->
                 <Button x:Name="ListDirs" Style="{StaticResource MenuButton2}" Click="ShowPopup" ></Button>
-
             </StackPanel>
             <Popup x:Name="Popup1" Placement="Absolute" HorizontalOffset="300" VerticalOffset="300">
                 <Grid Height="250" Width="400">
