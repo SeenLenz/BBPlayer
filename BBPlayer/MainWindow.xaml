@@ -53,26 +53,27 @@
                         </Rectangle.Fill>
                     </Rectangle>
                     <StackPanel Orientation="Horizontal">
-                        <Button Width="80" HorizontalAlignment="Left" Background="Transparent" BorderBrush="Transparent">
+                        <Button Width="80" HorizontalAlignment="Left" Background="Transparent" BorderBrush="Transparent" Click="bt_AddFolder">
                             <Image Source="/plus-icon.png" Stretch="Fill">
 
                             </Image>
                         </Button>
-                        <TextBlock Foreground="#6e6e6e" FontSize="24" FontFamily="Comic Sans MS" TextWrapping="WrapWithOverflow" Text=" Kérem válassza ki a zenéket 
+                        <TextBlock Background="Transparent" Foreground="#6e6e6e" FontSize="24" FontFamily="Comic Sans MS" TextWrapping="WrapWithOverflow" Text=" Kérem válassza ki a zenéket 
                 tartalamzó mappákat" Width="320">
                         </TextBlock>
                     </StackPanel>
+                    <Button x:Name="closeWindow" BorderBrush="Transparent" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20"  Panel.ZIndex="10" Click="closeWindow1">
+                        <Image Source="/CloseIcon.png" Stretch="Fill"></Image>
+                    </Button>
                     <ScrollViewer Grid.Row="1" Background="Transparent">
-                        <TextBox Text="mappa1" Foreground="#6e6e6e" FontSize="20"></TextBox>
+                        <TextBox Background="Transparent" x:Name="tb_addedFolders" Text="" Foreground="#6e6e6e" FontSize="20"></TextBox>
                     </ScrollViewer>
                 </Grid>
             </Popup>
             <StackPanel x:Name="controlPanelAlul" Grid.Row="2" Grid.ColumnSpan="2" FlowDirection="LeftToRight" Height="auto" Width="auto">
-                <Border BorderBrush="#6E6E6E" BorderThickness="3" HorizontalAlignment="Left">
-                    <Image x:Name="CurrentTrackImg" Style="{StaticResource AlbumCover}" Source="/Sanyi.png" Height="82" Width="82"/>
-                </Border>
+                <Border BorderBrush="#6E6E6E" BorderThickness="3" HorizontalAlignment="Left"/>
             </StackPanel>
-            <Button x:Name="closeWindow" BorderBrush="Transparent" Background="Transparent" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20"  Panel.ZIndex="10" Click="closeWindow1">
+            <Button x:Name="closePopup" BorderBrush="Transparent" Background="Transparent" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20"  Panel.ZIndex="10" Click="closeWindow1">
                 <Image Source="/CloseIcon.png" Stretch="Fill"></Image>
             </Button> 
             <Grid Background="Black" Opacity="0.7" Grid.Row="2" Grid.Column="2">

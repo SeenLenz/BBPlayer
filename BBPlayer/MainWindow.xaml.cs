@@ -29,6 +29,7 @@ using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Globalization;
+using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
 
 namespace BBPlayer
 {
@@ -515,10 +516,10 @@ namespace BBPlayer
         }
         private void ParseFolder(string path)
         {
-            this.Files.AddRange(Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
-                    .Where(item => SupportedFormats.Contains(Path.GetExtension(item).ToLower()))
-                    .Select(item => Path.GetFullPath(item))
-                    .ToList());
+                this.Files.AddRange(Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
+                     .Where(item => SupportedFormats.Contains(Path.GetExtension(item).ToLower()))
+                     .Select(item => Path.GetFullPath(item))
+                     .ToList());
         }
         private void LoadSong(string path) { }
 
@@ -656,6 +657,10 @@ namespace BBPlayer
                 {
                     formatter.Serialize(stream, this.Folders);
                 }
+            }
+            foreach (var item in this.Folders)
+            {
+                tb_addedFolders.Text += item;
             }
         }
         //private void bt_ListDirectories(object sender, RoutedEventArgs e)
@@ -1145,14 +1150,20 @@ namespace BBPlayer
             Application.Current.Shutdown();
         }
 
-        private void btn_Title_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+       
 
         private void ShowPopup(object sender, RoutedEventArgs e)
         {
+            foreach (var item in this.Folders)
+            {
+                tb_addedFolders.Text += item;
+            }
             Popup1.IsOpen = true;
+        }
+        private void ClosePopup(object sender, RoutedEventArgs e)
+        {
+            tb_addedFolders.Text = "";
+            Popup1.IsOpen = false;
         }
     }
 }
