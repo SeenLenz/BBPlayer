@@ -68,7 +68,25 @@ namespace BBPlayer
         private WaveOutEvent outputDevice = new WaveOutEvent();
         private AudioFileReader audioFile;
 
-        private Song SongInFocus;
+        private Song _songInFocus;
+
+        public Song SongInFocus
+        {
+            get { return _songInFocus; }
+            set
+            {
+                if (_songInFocus != value)
+                {
+                    _songInFocus = value;
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        lb_songName.Content = Convert.ToString(value.Title);
+                    });
+                }
+            }
+        }
+
+    
         private ObservableCollection<Song> SongList = new ObservableCollection<Song> { };
 
 
@@ -143,12 +161,7 @@ namespace BBPlayer
         private System.Threading.Tasks.Task PlaybackTask;
         private System.Threading.Tasks.Task FileTask;
         private System.Threading.Tasks.Task PlaybackStateTask;
-        string SongListPath = @"./SongList.json";
-        string ConfigPath = @"./Config.json";
-        string FoldersPath = @"./Folders.json";
-        string MediaLibraryPath = @"./MediaLibrary.json";
-        string AlbumsPath = @"./Albums.Json";
-        string PlaylistsPath = @"./Playlists.json";
+
 
         ICollectionView view;
 
@@ -330,7 +343,7 @@ namespace BBPlayer
             Closing += WindowEventClose;
 
             CollectionView sortview = (CollectionView)CollectionViewSource.GetDefaultView(SongPanel.ItemsSource); ;
-            //sortview.Filter = SongFilter;
+            sortview.Filter = SongFilter;
         }
 
         private void MediaTask()
@@ -512,18 +525,18 @@ namespace BBPlayer
 
         #region Gui Event Handlers
 
-        //private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
-        //{
-        //    CollectionViewSource.GetDefaultView(SongPanel.ItemsSource).Refresh();
-        //}
+        private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            CollectionViewSource.GetDefaultView(SongPanel.ItemsSource).Refresh();
+        }
 
-        //private bool SongFilter(object item)
-        //{
-        //    if (String.IsNullOrEmpty(txtSearch.Text))
-        //        return true;
-        //    else
-        //        return ((item as Song).Title.IndexOf(txtSearch.Text, StringComparison.OrdinalIgnoreCase) >= 0);
-        //}
+        private bool SongFilter(object item)
+        {
+            if (String.IsNullOrEmpty(txtSearch.Text))
+                return true;
+            else
+                return ((item as Song).Title.IndexOf(txtSearch.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
 
         private void SongFocusChanged(object sender, SelectionChangedEventArgs e)
         {
