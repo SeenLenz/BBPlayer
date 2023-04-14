@@ -48,8 +48,8 @@
                 </ComboBox>
                 
             </StackPanel>
-            <Popup x:Name="Popup1" Placement="Absolute" HorizontalOffset="300" VerticalOffset="300">
-                <Grid Height="250" Width="400">
+            <Popup x:Name="Popup1"  >
+                <Grid Height="300" Width="500">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"></RowDefinition>
                         <RowDefinition Height="2*"></RowDefinition>
@@ -72,7 +72,7 @@
                 tartalamzó mappákat" Width="320">
                         </TextBlock>
                     </StackPanel>
-                    <Button x:Name="closeWindow" BorderBrush="Transparent" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20"  Panel.ZIndex="10" Click="closeWindow1">
+                    <Button x:Name="closeWindow" BorderBrush="Transparent" Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" Width="20"  Panel.ZIndex="10" Click="ClosePopup">
                         <Image Source="/CloseIcon.png" Stretch="Fill"></Image>
                     </Button>
                     <ScrollViewer Grid.Row="1" Background="Transparent">

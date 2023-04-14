@@ -1243,7 +1243,7 @@ namespace BBPlayer
         {
             foreach (var item in this.Folders)
             {
-                tb_addedFolders.Text += item;
+                tb_addedFolders.Text += $"{item} \n";
             }
             Popup1.IsOpen = true;
         }
