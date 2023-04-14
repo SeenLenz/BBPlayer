@@ -30,7 +30,39 @@
             </Rectangle>
             <StackPanel x:Name="ControlBar" Background="Black" Opacity="0.8" Grid.RowSpan="2"  Height="auto" Width="auto">
                 <Button x:Name="btn_Title" Style="{StaticResource Title}" Click="bt_AddFolder"/>
+                <Button x:Name="localfiles" Style="{StaticResource MenuButton1}" ></Button> <!--csak hogy ne legyen ures a panek-->
+                <Button x:Name="ListDirs" Style="{StaticResource MenuButton2}" Click="ShowPopup" ></Button>
+
             </StackPanel>
+            <Popup x:Name="Popup1" Placement="Absolute" HorizontalOffset="300" VerticalOffset="300">
+                <Grid Height="250" Width="400">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"></RowDefinition>
+                        <RowDefinition Height="2*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Rectangle x:Name="popUPBackground" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="0,-4,0,4">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="Purple" Offset="0.0"/>
+                                <GradientStop Color="Black" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Width="80" HorizontalAlignment="Left" Background="Transparent" BorderBrush="Transparent">
+                            <Image Source="/plus-icon.png" Stretch="Fill">
+
+                            </Image>
+                        </Button>
+                        <TextBlock Foreground="#6e6e6e" FontSize="24" FontFamily="Comic Sans MS" TextWrapping="WrapWithOverflow" Text=" Kérem válassza ki a zenéket 
+                tartalamzó mappákat" Width="320">
+                        </TextBlock>
+                    </StackPanel>
+                    <ScrollViewer Grid.Row="1" Background="Transparent">
+                        <TextBox Text="mappa1" Foreground="#6e6e6e" FontSize="20"></TextBox>
+                    </ScrollViewer>
+                </Grid>
+            </Popup>
             <StackPanel x:Name="controlPanelAlul" Grid.Row="2" Grid.ColumnSpan="2" FlowDirection="LeftToRight" Height="auto" Width="auto">
                 <Border BorderBrush="#6E6E6E" BorderThickness="3" HorizontalAlignment="Left">
                     <Image x:Name="CurrentTrackImg" Style="{StaticResource AlbumCover}" Source="/Sanyi.png" Height="82" Width="82"/>

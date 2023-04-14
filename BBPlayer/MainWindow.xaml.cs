@@ -1135,5 +1135,10 @@ namespace BBPlayer
         {
 
         }
+
+        private void ShowPopup(object sender, RoutedEventArgs e)
+        {
+            Popup1.IsOpen = true;
+        }
     }
 }
