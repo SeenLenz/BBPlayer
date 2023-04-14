@@ -838,21 +838,22 @@ namespace BBPlayer
                 }
                 else
                 {
-                    int x = random.Next(0, SongList.Count - 1);
-                    if (SongIndex == x)
-                    {
-                        Replay_OnSongEnd();
-                    }
-                    else
-                    {
+                        int x = random.Next(0, SongList.Count - 1);
                         PauseSong();
                         this.PlaybackState = 0;
                         this.státusz = 0;
                         this.audioFile.Position = 0;
                         this.SongInFocus = SongList[x];
                         PlaySong();
-                    }
                 }
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
+                    bitmap.EndInit();
+                    play_pic.Source = bitmap;
+                });
             }
             else if (this.isReplay == true)
             {
@@ -891,6 +892,15 @@ namespace BBPlayer
                     this.outputDevice.Dispose();
                     PlaySong();
                 }
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
+                    bitmap.EndInit();
+                    play_pic.Source = bitmap;
+                });
+               
             }
             else if (this.isReplayInfinite == true)
             {
@@ -900,10 +910,27 @@ namespace BBPlayer
                 this.audioFile.Position = 0;
 
                 PlaySong();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
+                    bitmap.EndInit();
+                    play_pic.Source = bitmap;
+                });
             }
             else
             {
                 PauseSong();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri("./img/play.png", UriKind.Relative);
+                    bitmap.EndInit();
+                    play_pic.Source = bitmap;
+                });
             }
         }
         private void Shuffle()
@@ -972,7 +999,14 @@ namespace BBPlayer
                 });
                 PlaySong();
             }
-
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
+                bitmap.EndInit();
+                play_pic.Source = bitmap;
+            });
 
         }
         private void NextSong()
@@ -991,6 +1025,14 @@ namespace BBPlayer
                     this.outputDevice.Dispose();
                 });
                 this.PlaySong();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
+                    bitmap.EndInit();
+                    play_pic.Source = bitmap;
+                });
             }
 
 
@@ -1104,7 +1146,7 @@ namespace BBPlayer
             {
                 BitmapImage bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.UriSource = new Uri("./img/play.png", UriKind.Relative);
+                bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
                 bitmap.EndInit();
                 play_pic.Source = bitmap;
             });
