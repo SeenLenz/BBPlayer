@@ -545,6 +545,18 @@ namespace BBPlayer
             try
             {
                 this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.SelectedIndex])];
+                if (play == true)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        status.Content = "0:00";
+                        this.státusz = 0;
+                        this.PlaybackState = 0;
+                        Slider.Value = 0;
+                        this.outputDevice.Stop();
+                    });
+                    PlaySong();
+                }
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -699,7 +711,9 @@ namespace BBPlayer
             }
 
         }
-        private void bt_Next(object sender, RoutedEventArgs e) { NextSong(); }
+        private void bt_Next(object sender, RoutedEventArgs e) {
+                NextSong();
+        }
         private void bt_Previous(object sender, RoutedEventArgs e) { PreviousSong(); }
         private void bt_Replay(object sender, RoutedEventArgs e) { Replay(); }
         private void DragStarted(object sender, DragStartedEventArgs e) { onDragStarted(); }
@@ -993,7 +1007,7 @@ namespace BBPlayer
             }
             else if (SongIndex - 1 != -1)
             {
-                this.SongInFocus = this.SongList[--SongIndex];
+                this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[--SongPanel.SelectedIndex])];
 
                 Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -1032,29 +1046,60 @@ namespace BBPlayer
         {
             if (SongIndex + 1 != SongList.Count)
             {
-                this.SongInFocus = this.SongList[++SongIndex];
+                if (this.isShuffle == true)
+                {
+                    if (this.isReplayInfinite == true)
+                    {
+                        PauseSong();
+                        this.PlaybackState = 0;
+                        this.státusz = 0;
+                        this.audioFile.Position = 0;
 
-                Application.Current.Dispatcher.Invoke(() =>
+                        PlaySong();
+                    }
+                    else
+                    {
+                        int x = random.Next(0, SongList.Count - 1);
+                        PauseSong();
+                        this.PlaybackState = 0;
+                        this.státusz = 0;
+                        this.audioFile.Position = 0;
+                        this.SongInFocus = SongList[x];
+                        PlaySong();
+                    }
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        BitmapImage bitmap = new BitmapImage();
+                        bitmap.BeginInit();
+                        bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
+                        bitmap.EndInit();
+                        play_pic.Source = bitmap;
+                    });
+                }
+                else
                 {
-                    status.Content = "0:00";
-                    this.státusz = 0;
-                    this.PlaybackState = 0;
-                    Slider.Value = 0;
-                    this.outputDevice.Stop();
-                    this.outputDevice.Dispose();
-                });
-                this.PlaySong();
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    BitmapImage bitmap = new BitmapImage();
-                    bitmap.BeginInit();
-                    bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
-                    bitmap.EndInit();
-                    play_pic.Source = bitmap;
-                });
+                    this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[++SongPanel.SelectedIndex])];
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        status.Content = "0:00";
+                        this.státusz = 0;
+                        this.PlaybackState = 0;
+                        Slider.Value = 0;
+                        this.outputDevice.Stop();
+                        this.outputDevice.Dispose();
+                    });
+                    this.PlaySong();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        BitmapImage bitmap = new BitmapImage();
+                        bitmap.BeginInit();
+                        bitmap.UriSource = new Uri("./img/pause.png", UriKind.Relative);
+                        bitmap.EndInit();
+                        play_pic.Source = bitmap;
+                    });
+                }
             }
-
-
         }
         //private void Replay() { }
         //private void Shuffle() { }
