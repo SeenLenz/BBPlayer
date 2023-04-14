@@ -890,10 +890,10 @@ namespace BBPlayer
             }
             else if (this.isReplay == true)
             {
-                if (this.SongInFocus == this.SongList[SongList.Count - 1]) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
+                if (this.SongInFocus == this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[SongPanel.Items.Count - 1])]) // megvizsgálni hogy a lejátszási lista végén vagyunk-e
                 {
                     PauseSong();
-                    this.SongInFocus = this.SongList[0];
+                    this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[0])];
                     SongIndex = 0;
                     this.outputDevice.Stop();
                     this.outputDevice.Dispose();
@@ -911,7 +911,7 @@ namespace BBPlayer
                     PauseSong();
                     if (SongIndex + 1 != SongList.Count)
                     {
-                        this.SongInFocus = this.SongList[++SongIndex];
+                        this.SongInFocus = this.SongList[this.SongList.IndexOf((Song)SongPanel.Items[++SongPanel.SelectedIndex])];
 
                         Application.Current.Dispatcher.Invoke(() =>
                         {
