@@ -26,7 +26,7 @@
         <Setter Property="Margin" Value="10px,0px , 0px ,20px"/>
     </Style>
     <Style x:Key="MenuButton2" TargetType="Button">
-        <Setter Property="Content" Value="Playlists"/>
+        <Setter Property="Content" Value="Mappa hozzáadása.."/>
         <Setter Property="FontFamily" Value="Comic Sans MS"/>
         <Setter Property="Background" Value="#00000000"/>
         <Setter Property="BorderBrush" Value="Black"/>
